@@ -50,6 +50,10 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    curator_identity_profiles: Mapped[list[CuratorIdentityProfile]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
 
 class LearnerIntent(Base):
@@ -175,3 +179,27 @@ class NudgeHistory(Base):
     )
 
     user: Mapped[User] = relationship(back_populates="nudge_history")
+
+
+class CuratorIdentityProfile(Base):
+    """Generated Curator identity profile stored as structured JSON."""
+
+    __tablename__ = "curator_identity_profiles"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        index=True,
+        nullable=True,
+    )
+    display_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    profession: Mapped[str] = mapped_column(String(255), nullable=False)
+    profile_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    onboarding_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+    user: Mapped[User | None] = relationship(back_populates="curator_identity_profiles")

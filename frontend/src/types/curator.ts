@@ -38,6 +38,7 @@ export type CuratorOnboardingResponse = {
   message: string;
   nextRoute: string;
   submittedAt: string;
+  identityProfileId: number;
   identityProfile: {
     current_identity: string;
     desired_future_identity: string;

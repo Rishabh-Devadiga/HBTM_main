@@ -99,4 +99,5 @@ class CuratorOnboardingResponse(BaseModel):
     message: str
     nextRoute: str
     submittedAt: datetime
+    identityProfileId: int
     identityProfile: IdentityProfile
