@@ -1,0 +1,1 @@
+"""Curator-domain configuration placeholders."""
