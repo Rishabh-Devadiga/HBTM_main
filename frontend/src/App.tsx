@@ -5,6 +5,7 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { AIMentorPage } from "@/pages/AIMentorPage";
 import { ApiTestPage } from "@/pages/ApiTestPage";
 import { ChatPage } from "@/pages/ChatPage";
+import { AuthChoicePage } from "@/pages/AuthChoicePage";
 import { CuratorOnboardingPage } from "@/pages/CuratorOnboardingPage";
 import { CuratorOnboardingSuccessPage } from "@/pages/CuratorOnboardingSuccessPage";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -31,6 +32,14 @@ export default function App() {
   return (
     <Routes>
       <Route index element={<HomePage />} />
+      <Route
+        path="auth"
+        element={
+          <PublicOnly>
+            <AuthChoicePage />
+          </PublicOnly>
+        }
+      />
       <Route
         path="login"
         element={
@@ -130,7 +139,7 @@ function RequireAuth({
     return <div className="min-h-screen bg-[#bdbdbd]" />;
   }
   if (!auth.isAuthenticated) {
-    return <Navigate replace state={{ from: location.pathname }} to="/login" />;
+    return <Navigate replace state={{ from: location.pathname }} to="/" />;
   }
   if (
     activeDomain.id === "curator" &&

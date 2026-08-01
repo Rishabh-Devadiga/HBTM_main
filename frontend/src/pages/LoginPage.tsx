@@ -3,6 +3,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { useAuth } from "@/context/AuthContext";
 import { activeDomain } from "@/domain";
@@ -41,6 +42,12 @@ export function LoginPage() {
         <p className="mt-2 text-sm font-medium text-slate-500">
           Continue to your {activeDomain.application.workspaceName}.
         </p>
+        <SocialAuthButtons onUnavailable={setError} />
+        <div className="my-5 flex items-center gap-3">
+          <span className="h-px flex-1 bg-slate-200" />
+          <span className="text-xs font-semibold uppercase text-slate-400">or</span>
+          <span className="h-px flex-1 bg-slate-200" />
+        </div>
         <label className="mt-6 block text-sm font-semibold text-slate-700">
           Email
           <input
