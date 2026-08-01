@@ -3,7 +3,9 @@ import type { ApiSuccessResponse } from "@/types/api";
 export type AuthUser = {
   id: number;
   name: string;
+  username: string | null;
   email: string | null;
+  avatarUrl: string | null;
   createdAt: string;
 };
 
@@ -22,6 +24,18 @@ export type AuthResponse = {
 export type RegisterResponse = {
   user: AuthUser;
   message: string;
+};
+
+export type UpdateProfilePayload = {
+  name?: string;
+  username?: string;
+  email?: string;
+  avatarUrl?: string;
+};
+
+export type UpdatePasswordPayload = {
+  currentPassword: string;
+  newPassword: string;
 };
 
 export type AuthStatusApiResponse = ApiSuccessResponse<AuthStatus>;

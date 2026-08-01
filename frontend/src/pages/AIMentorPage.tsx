@@ -1,8 +1,9 @@
-import { AlertTriangle, Bot, RefreshCw, X } from "lucide-react";
+import { AlertTriangle, RefreshCw, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@/components/common/Button";
+import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { MentorChat } from "@/components/mentor/MentorChat";
 import { useSession } from "@/context/SessionContext";
 import { activeDomain } from "@/domain";
@@ -79,8 +80,8 @@ function LearningAIMentorPage() {
     <div className="mx-auto max-w-[960px] space-y-5">
       <header className="rounded-md border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center gap-4">
-          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-md shadow-blue-100">
-            <Bot className="h-6 w-6" aria-hidden="true" />
+          <span className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-slate-950 text-white shadow-md">
+            <SaarthiLogo className="h-6 w-7" />
           </span>
           <div>
             <h1 className="text-2xl font-bold text-slate-950 sm:text-3xl">
@@ -167,7 +168,6 @@ function CuratorGrowthCoachPage() {
     })),
     ...optimisticMessages,
   ];
-  const suggestions = conversationsQuery.data?.data.suggestedPrompts ?? [];
   const isLoading =
     conversationsQuery.isLoading ||
     createConversation.isPending ||
@@ -212,8 +212,8 @@ function CuratorGrowthCoachPage() {
       <header className="rounded-md border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <span className="flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-md shadow-blue-100">
-              <Bot className="h-6 w-6" aria-hidden="true" />
+            <span className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-slate-950 text-white shadow-md">
+              <SaarthiLogo className="h-6 w-7" />
             </span>
             <div>
               <h1 className="text-2xl font-bold text-slate-950 sm:text-3xl">
@@ -247,8 +247,7 @@ function CuratorGrowthCoachPage() {
           isLoading={isLoading}
           messages={messages}
           onSend={(message) => void sendMessage(message)}
-          starterPrompts={suggestions}
-          suggestions={suggestions}
+          suggestions={[]}
         />
       )}
 

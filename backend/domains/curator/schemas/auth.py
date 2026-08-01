@@ -7,12 +7,13 @@ from pydantic import BaseModel, Field
 
 class CuratorRegisterRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
+    username: str = Field(..., min_length=3, max_length=80, pattern=r"^[A-Za-z0-9_.-]+$")
     email: str = Field(..., min_length=3, max_length=255, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     password: str = Field(..., min_length=8, max_length=128)
 
 
 class CuratorLoginRequest(BaseModel):
-    email: str = Field(..., min_length=3, max_length=255, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    identifier: str = Field(..., min_length=3, max_length=255)
     password: str = Field(..., min_length=1, max_length=128)
 
 
@@ -30,8 +31,22 @@ class CuratorAppleLoginRequest(BaseModel):
 class AuthUser(BaseModel):
     id: int
     name: str
+    username: str | None
     email: str | None
+    avatarUrl: str | None
     createdAt: str
+
+
+class CuratorProfileUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    username: str | None = Field(default=None, min_length=3, max_length=80, pattern=r"^[A-Za-z0-9_.-]+$")
+    email: str | None = Field(default=None, min_length=3, max_length=255, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    avatarUrl: str | None = Field(default=None, max_length=2000)
+
+
+class CuratorPasswordUpdateRequest(BaseModel):
+    currentPassword: str = Field(..., min_length=1, max_length=128)
+    newPassword: str = Field(..., min_length=8, max_length=128)
 
 
 class CuratorAuthResponse(BaseModel):

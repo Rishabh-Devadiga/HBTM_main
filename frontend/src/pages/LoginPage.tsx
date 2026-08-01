@@ -11,7 +11,7 @@ import { activeDomain } from "@/domain";
 export function LoginPage() {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +21,7 @@ export function LoginPage() {
     setError(null);
     setIsSubmitting(true);
     try {
-      const completed = await auth.login({ email, password });
+      const completed = await auth.login({ identifier, password });
       navigate(completed ? "/dashboard" : "/curator/onboarding", { replace: true });
     } catch (requestError) {
       setError(
@@ -49,13 +49,12 @@ export function LoginPage() {
           <span className="h-px flex-1 bg-slate-200" />
         </div>
         <label className="mt-6 block text-sm font-semibold text-slate-700">
-          Email
+          Username or email
           <input
             className="mt-2 h-12 w-full rounded-[8px] border border-slate-200 px-4 text-sm"
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => setIdentifier(event.target.value)}
             required
-            type="email"
-            value={email}
+            value={identifier}
           />
         </label>
         <label className="mt-4 block text-sm font-semibold text-slate-700">

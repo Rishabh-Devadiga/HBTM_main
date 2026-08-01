@@ -12,7 +12,7 @@ import jwt
 import requests
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
-from sqlalchemy import select
+from sqlalchemy import inspect, select, text
 
 from backend.database.crud import get_db_session
 from backend.database.database import engine
@@ -42,15 +42,32 @@ class CuratorAuthService:
     def __init__(self) -> None:
         self._ensure_tables()
 
-    def register(self, *, name: str, email: str, password: str) -> AuthUser:
+    def register(
+        self,
+        *,
+        name: str,
+        username: str,
+        email: str,
+        password: str,
+    ) -> AuthUser:
         normalized_email = email.strip().lower()
+        normalized_username = self._normalize_username(username)
         with get_db_session() as session:
             existing = session.scalars(
                 select(User).where(User.email == normalized_email)
             ).first()
             if existing is not None:
                 raise ValueError("An account with this email already exists.")
-            user = User(name=name.strip(), email=normalized_email)
+            existing_username = session.scalars(
+                select(User).where(User.username == normalized_username)
+            ).first()
+            if existing_username is not None:
+                raise ValueError("An account with this username already exists.")
+            user = User(
+                name=name.strip(),
+                username=normalized_username,
+                email=normalized_email,
+            )
             session.add(user)
             session.flush()
             session.add(
@@ -63,11 +80,14 @@ class CuratorAuthService:
             session.refresh(user)
             return self._to_auth_user(user)
 
-    def login(self, *, email: str, password: str) -> tuple[str, AuthUser, bool]:
-        normalized_email = email.strip().lower()
+    def login(self, *, identifier: str, password: str) -> tuple[str, AuthUser, bool]:
+        normalized_identifier = identifier.strip().lower()
         with get_db_session() as session:
             user = session.scalars(
-                select(User).where(User.email == normalized_email)
+                select(User).where(
+                    (User.email == normalized_identifier)
+                    | (User.username == normalized_identifier)
+                )
             ).first()
             if user is None:
                 raise ValueError("Invalid email or password.")
@@ -199,6 +219,67 @@ class CuratorAuthService:
             if record is not None:
                 session.delete(record)
 
+    def update_profile(
+        self,
+        *,
+        user_id: int,
+        name: str | None = None,
+        username: str | None = None,
+        email: str | None = None,
+        avatar_url: str | None = None,
+    ) -> AuthUser:
+        with get_db_session() as session:
+            user = session.get(User, user_id)
+            if user is None:
+                raise ValueError("User not found.")
+            if name is not None:
+                user.name = name.strip()
+            if username is not None:
+                normalized_username = self._normalize_username(username)
+                existing = session.scalars(
+                    select(User).where(
+                        User.username == normalized_username,
+                        User.id != user_id,
+                    )
+                ).first()
+                if existing is not None:
+                    raise ValueError("An account with this username already exists.")
+                user.username = normalized_username
+            if email is not None:
+                normalized_email = email.strip().lower()
+                existing = session.scalars(
+                    select(User).where(
+                        User.email == normalized_email,
+                        User.id != user_id,
+                    )
+                ).first()
+                if existing is not None:
+                    raise ValueError("An account with this email already exists.")
+                user.email = normalized_email
+            if avatar_url is not None:
+                user.avatar_url = avatar_url.strip() or None
+            session.flush()
+            session.refresh(user)
+            return self._to_auth_user(user)
+
+    def update_password(
+        self,
+        *,
+        user_id: int,
+        current_password: str,
+        new_password: str,
+    ) -> None:
+        with get_db_session() as session:
+            credential = session.scalars(
+                select(UserCredential).where(UserCredential.user_id == user_id)
+            ).first()
+            if credential is None:
+                raise ValueError("Password changes are unavailable for this account.")
+            if not self._verify_password(current_password, credential.password_hash):
+                raise ValueError("Current password is incorrect.")
+            credential.password_hash = self._hash_password(new_password)
+            session.flush()
+
     def _login_with_social_identity(
         self,
         *,
@@ -286,11 +367,16 @@ class CuratorAuthService:
         ).hex()
         return hmac.compare_digest(candidate, digest)
 
+    def _normalize_username(self, username: str) -> str:
+        return username.strip().lower()
+
     def _to_auth_user(self, user: User) -> AuthUser:
         return AuthUser(
             id=user.id,
             name=user.name,
+            username=user.username,
             email=user.email,
+            avatarUrl=user.avatar_url,
             createdAt=user.created_at.isoformat(),
         )
 
@@ -302,3 +388,17 @@ class CuratorAuthService:
             UserSession.__table__,
         ):
             table.create(bind=engine, checkfirst=True)
+        self._ensure_user_profile_columns()
+
+    def _ensure_user_profile_columns(self) -> None:
+        columns = {column["name"] for column in inspect(engine).get_columns("users")}
+        statements: list[str] = []
+        if "username" not in columns:
+            statements.append("ALTER TABLE users ADD COLUMN username VARCHAR(80)")
+        if "avatar_url" not in columns:
+            statements.append("ALTER TABLE users ADD COLUMN avatar_url TEXT")
+        if not statements:
+            return
+        with engine.begin() as connection:
+            for statement in statements:
+                connection.execute(text(statement))
