@@ -122,13 +122,7 @@ async def submit_curator_onboarding(
         ) from exc
     except Exception as exc:
         logger.exception("Unexpected Curator onboarding failure.")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "message": "Failed to submit Curator onboarding.",
-                "error_code": "onboarding_failed",
-            },
-        ) from exc
+        raise
 
     return SuccessResponse(
         message="Curator onboarding accepted successfully.",
