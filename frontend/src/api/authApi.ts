@@ -28,6 +28,28 @@ export async function loginCuratorUser(payload: {
   return response.data;
 }
 
+export async function loginCuratorUserWithGoogle(payload: {
+  idToken?: string;
+  code?: string;
+}): Promise<AuthApiResponse> {
+  const response = await apiClient.post<AuthApiResponse>(
+    "/curator/auth/google",
+    payload
+  );
+  return response.data;
+}
+
+export async function loginCuratorUserWithApple(payload: {
+  idToken: string;
+  name?: string;
+}): Promise<AuthApiResponse> {
+  const response = await apiClient.post<AuthApiResponse>(
+    "/curator/auth/apple",
+    payload
+  );
+  return response.data;
+}
+
 export async function getCuratorAuthStatus(): Promise<AuthStatusApiResponse> {
   const response = await apiClient.get<AuthStatusApiResponse>("/curator/auth/me");
   return response.data;

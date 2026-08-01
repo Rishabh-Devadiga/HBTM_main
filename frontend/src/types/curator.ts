@@ -291,3 +291,33 @@ export type OpportunitiesApiResponse = ApiSuccessResponse<OpportunitiesResponse>
 
 export type OpportunityEngagementApiResponse =
   ApiSuccessResponse<OpportunityEngagementResponse>;
+
+export type CommunityWorkshop = {
+  id: number;
+  title: string;
+  topicGoal: string;
+  dateTime: string;
+  location: string;
+  isOnline: boolean;
+  participantsCount: number;
+  matchingReason: string;
+  isJoined: boolean;
+};
+
+export type CommunityWorkshopsResponse = {
+  identityProfileId: number;
+  generatedAt: string | null;
+  workshops: CommunityWorkshop[];
+};
+
+export type CommunityWorkshopMembershipResponse = {
+  workshopId: number;
+  participantsCount: number;
+  isJoined: boolean;
+};
+
+export type CommunityWorkshopsApiResponse =
+  ApiSuccessResponse<CommunityWorkshopsResponse>;
+
+export type CommunityWorkshopMembershipApiResponse =
+  ApiSuccessResponse<CommunityWorkshopMembershipResponse>;

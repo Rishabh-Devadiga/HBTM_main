@@ -36,6 +36,11 @@ class Settings:
     youtube_api_keys: tuple[str, ...] = ()
     google_client_id: str | None = None
     google_client_secret: str | None = None
+    apple_client_id: str | None = None
+    apple_team_id: str | None = None
+    apple_key_id: str | None = None
+    apple_private_key: str | None = None
+    apple_redirect_uri: str | None = None
 
 
 def _required_env(name: str) -> str:
@@ -108,4 +113,9 @@ def get_settings() -> Settings:
         youtube_api_keys=tuple(key.value for key in youtube_keys),
         google_client_id=os.getenv("GOOGLE_CLIENT_ID"),
         google_client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+        apple_client_id=_optional_env("APPLE_CLIENT_ID"),
+        apple_team_id=_optional_env("APPLE_TEAM_ID"),
+        apple_key_id=_optional_env("APPLE_KEY_ID"),
+        apple_private_key=_optional_env("APPLE_PRIVATE_KEY"),
+        apple_redirect_uri=_optional_env("APPLE_REDIRECT_URI"),
     )

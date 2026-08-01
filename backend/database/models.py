@@ -88,6 +88,30 @@ class UserCredential(Base):
     )
 
 
+class UserSocialIdentity(Base):
+    """External identity provider account linked to an application user."""
+
+    __tablename__ = "user_social_identities"
+    __table_args__ = (
+        UniqueConstraint("provider", "provider_subject", name="uq_user_social_provider_subject"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    provider: Mapped[str] = mapped_column(String(32), index=True, nullable=False)
+    provider_subject: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
 class UserSession(Base):
     """Persistent bearer session for a logged-in user."""
 
@@ -517,6 +541,74 @@ class CuratorOpportunityDismissal(Base):
     opportunity_id: Mapped[str] = mapped_column(String(200), index=True, nullable=False)
     opportunity_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     dismissed: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorCommunityWorkshop(Base):
+    """Persisted AI-recommended Curator community workshop."""
+
+    __tablename__ = "curator_community_workshops"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    title: Mapped[str] = mapped_column(String(240), nullable=False)
+    topic_goal: Mapped[str] = mapped_column(String(255), nullable=False)
+    scheduled_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    location: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_online: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    matching_reason: Mapped[str] = mapped_column(Text, nullable=False)
+    context_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorCommunityWorkshopMembership(Base):
+    """Persisted user membership in a community workshop."""
+
+    __tablename__ = "curator_community_workshop_memberships"
+    __table_args__ = (
+        UniqueConstraint(
+            "workshop_id",
+            "user_id",
+            name="uq_curator_workshop_membership_user",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    workshop_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_community_workshops.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    joined: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

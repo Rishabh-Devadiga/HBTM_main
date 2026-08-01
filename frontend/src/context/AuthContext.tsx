@@ -11,6 +11,8 @@ import {
 
 import {
   getCuratorAuthStatus,
+  loginCuratorUserWithApple,
+  loginCuratorUserWithGoogle,
   loginCuratorUser,
   logoutCuratorUser,
   registerCuratorUser,
@@ -26,6 +28,8 @@ type AuthContextValue = {
   onboardingCompleted: boolean;
   user: AuthUser | null;
   login: (payload: { email: string; password: string }) => Promise<boolean>;
+  loginWithGoogle: (payload: { idToken?: string; code?: string }) => Promise<boolean>;
+  loginWithApple: (payload: { idToken: string; name?: string }) => Promise<boolean>;
   register: (payload: {
     name: string;
     email: string;
@@ -86,6 +90,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return response.data.onboardingCompleted;
   }, []);
 
+  const applyAuthResponse = useCallback((response: Awaited<ReturnType<typeof loginCuratorUser>>) => {
+    localStorage.setItem(AUTH_TOKEN_KEY, response.data.token);
+    setAuthToken(response.data.token);
+    setUser(response.data.user);
+    setOnboardingCompleted(response.data.onboardingCompleted);
+    return response.data.onboardingCompleted;
+  }, []);
+
+  const loginWithGoogle = useCallback(
+    async (payload: { idToken?: string; code?: string }) => {
+      const response = await loginCuratorUserWithGoogle(payload);
+      return applyAuthResponse(response);
+    },
+    [applyAuthResponse]
+  );
+
+  const loginWithApple = useCallback(
+    async (payload: { idToken: string; name?: string }) => {
+      const response = await loginCuratorUserWithApple(payload);
+      return applyAuthResponse(response);
+    },
+    [applyAuthResponse]
+  );
+
   const register = useCallback(
     async (payload: { name: string; email: string; password: string }) => {
       await registerCuratorUser(payload);
@@ -112,11 +140,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onboardingCompleted,
       user,
       login,
+      loginWithApple,
+      loginWithGoogle,
       register,
       logout,
       refresh,
     }),
-    [isLoading, login, logout, onboardingCompleted, refresh, register, user]
+    [
+      isLoading,
+      login,
+      loginWithApple,
+      loginWithGoogle,
+      logout,
+      onboardingCompleted,
+      refresh,
+      register,
+      user,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

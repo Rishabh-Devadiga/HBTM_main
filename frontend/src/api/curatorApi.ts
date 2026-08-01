@@ -1,6 +1,8 @@
 import { apiClient } from "@/api/apiClient";
 import type {
   CuratorCoachChatApiResponse,
+  CommunityWorkshopMembershipApiResponse,
+  CommunityWorkshopsApiResponse,
   CuratorCoachConversationApiResponse,
   CuratorCoachConversationsApiResponse,
   CuratorGrowthJourneyApiResponse,
@@ -166,6 +168,33 @@ export async function dismissCuratorOpportunity({
   const response = await apiClient.post<OpportunityEngagementApiResponse>(
     "/curator/opportunities/dismiss",
     { opportunity, value }
+  );
+  return response.data;
+}
+
+export async function getCuratorCommunityWorkshops(): Promise<CommunityWorkshopsApiResponse> {
+  const response = await apiClient.get<CommunityWorkshopsApiResponse>(
+    "/curator/community/workshops"
+  );
+  return response.data;
+}
+
+export async function joinCuratorCommunityWorkshop(
+  workshopId: number
+): Promise<CommunityWorkshopMembershipApiResponse> {
+  const response = await apiClient.post<CommunityWorkshopMembershipApiResponse>(
+    `/curator/community/workshops/${workshopId}/join`,
+    {}
+  );
+  return response.data;
+}
+
+export async function leaveCuratorCommunityWorkshop(
+  workshopId: number
+): Promise<CommunityWorkshopMembershipApiResponse> {
+  const response = await apiClient.post<CommunityWorkshopMembershipApiResponse>(
+    `/curator/community/workshops/${workshopId}/leave`,
+    {}
   );
   return response.data;
 }
