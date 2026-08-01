@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Bell, Moon, Search, Sun, X } from "lucide-react";
+import { Bell, Search, X } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
@@ -10,6 +10,13 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { useSession } from "@/context/SessionContext";
 import { activeDomain } from "@/domain";
 
+export type WorkspaceTheme = "light" | "dark";
+
+export type AppLayoutOutletContext = {
+  setTheme: (theme: WorkspaceTheme) => void;
+  theme: WorkspaceTheme;
+};
+
 export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,7 +24,7 @@ export function AppLayout() {
   const { state } = useSession();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
+  const [theme, setTheme] = useState<WorkspaceTheme>(() => {
     const storedTheme = localStorage.getItem("ai-learning-agent-theme");
     return storedTheme === "dark" ? "dark" : "light";
   });
@@ -39,8 +46,12 @@ export function AppLayout() {
     navigate({ pathname: "/learning-plan", search: params.toString() });
   }
 
-  function handleThemeToggle() {
-    const nextTheme = theme === "light" ? "dark" : "light";
+  const navItem = activeDomain.navigation.items.find(
+    (item) => item.path === location.pathname
+  );
+  const pageTitle = navItem?.label ?? activeDomain.dashboard.pageTitle;
+
+  function handleThemeChange(nextTheme: WorkspaceTheme) {
     setTheme(nextTheme);
     localStorage.setItem("ai-learning-agent-theme", nextTheme);
   }
@@ -73,7 +84,7 @@ export function AppLayout() {
                 Monday, July 27 2026
               </p>
               <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950 sm:text-3xl">
-                {activeDomain.dashboard.pageTitle}
+                {pageTitle}
               </h1>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-2">
@@ -100,44 +111,6 @@ export function AppLayout() {
                   ) : null}
                 </label>
               ) : null}
-              <div
-                aria-label="Theme"
-                className="glass-control inline-flex h-10 items-center rounded-full p-1"
-                role="group"
-              >
-                <button
-                  aria-pressed={theme === "light"}
-                  className={cn(
-                    "inline-flex h-8 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold text-slate-600",
-                    theme === "light" && "blue-pill text-white"
-                  )}
-                  onClick={() => {
-                    if (theme !== "light") {
-                      handleThemeToggle();
-                    }
-                  }}
-                  type="button"
-                >
-                  <Sun className="h-3.5 w-3.5" aria-hidden="true" />
-                  Light
-                </button>
-                <button
-                  aria-pressed={theme === "dark"}
-                  className={cn(
-                    "inline-flex h-8 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold text-slate-600",
-                    theme === "dark" && "blue-pill text-white"
-                  )}
-                  onClick={() => {
-                    if (theme !== "dark") {
-                      handleThemeToggle();
-                    }
-                  }}
-                  type="button"
-                >
-                  <Moon className="h-3.5 w-3.5" aria-hidden="true" />
-                  Dark
-                </button>
-              </div>
               <button
                 aria-label="Notifications"
                 className="glass-control relative inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700"
@@ -200,7 +173,7 @@ export function AppLayout() {
             </div>
           </header>
           <div className="mx-auto w-full">
-            <Outlet />
+            <Outlet context={{ setTheme: handleThemeChange, theme }} />
           </div>
         </main>
       </div>

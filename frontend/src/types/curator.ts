@@ -232,3 +232,62 @@ export type CuratorResourceEngagementApiResponse =
 
 export type CuratorResourcePreferencesApiResponse =
   ApiSuccessResponse<CuratorResourcePreferences>;
+
+export type OpportunityCategory =
+  | "Hackathon"
+  | "Internship"
+  | "Job"
+  | "Workshop"
+  | "Meetup"
+  | "Conference"
+  | "Community"
+  | "Open Source"
+  | "Competition"
+  | "Certification";
+
+export type OpportunityMode = "Online" | "Offline" | "Hybrid" | "Unknown";
+
+export type OpportunityRecommendation = {
+  id: string;
+  title: string;
+  category: OpportunityCategory;
+  organizer: string;
+  location: string;
+  mode: OpportunityMode;
+  date: string;
+  description: string;
+  relevanceScore: number;
+  aiExplanation: string;
+  url: string;
+  tags: string[];
+  source: string;
+  isBookmarked: boolean;
+  isDismissed: boolean;
+};
+
+export type OpportunitiesResponse = {
+  identityProfileId: number;
+  recommendationId: number;
+  generatedAt: string;
+  staleAfter: string;
+  recommendationSummary: string;
+  selectionReasons: string[];
+  opportunities: OpportunityRecommendation[];
+  filters: {
+    category: OpportunityCategory | "All";
+    search: string;
+    location: string;
+    mode: OpportunityMode | "All";
+  };
+};
+
+export type OpportunityEngagementResponse = {
+  opportunityId: string;
+  isBookmarked: boolean;
+  isDismissed: boolean;
+};
+
+export type OpportunitiesApiResponse = ApiSuccessResponse<OpportunitiesResponse>;
+
+export type OpportunityEngagementApiResponse =
+  ApiSuccessResponse<OpportunityEngagementResponse>;

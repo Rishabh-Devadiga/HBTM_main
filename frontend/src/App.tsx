@@ -12,8 +12,11 @@ import { HomePage } from "@/pages/HomePage";
 import { LearningPlanPage } from "@/pages/LearningPlanPage";
 import { MockInterviewPage } from "@/pages/MockInterviewPage";
 import { OnboardingPage } from "@/pages/OnboardingPage";
+import { OpportunitiesPage } from "@/pages/OpportunitiesPage";
+import { ProfilePage } from "@/pages/ProfilePage";
 import { ProgressPage } from "@/pages/ProgressPage";
 import { QuizPage } from "@/pages/QuizPage";
+import { SettingsPage } from "@/pages/SettingsPage";
 import { activeDomain } from "@/domain";
 
 export default function App() {
@@ -53,6 +56,9 @@ export default function App() {
         <Route path="mentor" element={<AIMentorPage />} />
         <Route path="interview" element={<MockInterviewPage />} />
         <Route path="feedback" element={<FeedbackNudgesPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="opportunities" element={<OpportunitiesPage />} />
         <Route path="api-test" element={<ApiTestPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
