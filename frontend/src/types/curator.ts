@@ -51,6 +51,42 @@ export type CuratorOnboardingResponse = {
     available_time: string;
     initial_personalization_summary: string;
   };
+  growthPlan: {
+    journey: {
+      title: string;
+      currentStage: string;
+      destination: string;
+      estimatedDuration: string;
+      growthTheme: string;
+    };
+    mission: {
+      purpose: string;
+      successDefinition: string;
+    };
+    dailyFocus: {
+      objective: string;
+      estimatedMinutes: number;
+    };
+    weeklyMilestones: {
+      week: number;
+      title: string;
+      outcome: string;
+    }[];
+    habits: {
+      daily: string[];
+      weekly: string[];
+    };
+    curationStrategy: {
+      recommendedMediaCategories: string[];
+      recommendedLearningStyle: string;
+      recommendedActivityTypes: string[];
+    };
+    reflectionPrompts: string[];
+    successMetrics: {
+      indicators: string[];
+    };
+    aiSummary: string;
+  };
 };
 
 export type CuratorOnboardingApiResponse =

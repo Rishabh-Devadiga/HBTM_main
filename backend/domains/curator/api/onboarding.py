@@ -22,6 +22,7 @@ from backend.domains.curator.workflows.identity_profile_persistence_service impo
 from backend.domains.curator.workflows.onboarding_service import (
     CuratorOnboardingService,
 )
+from backend.framework.agents.base_agent import TransientLLMError
 
 
 logger = logging.getLogger(__name__)
@@ -86,6 +87,18 @@ async def submit_curator_onboarding(
     logger.info("Received Curator onboarding request.")
     try:
         response = await run_in_threadpool(service.submit_onboarding, request)
+    except TransientLLMError as exc:
+        logger.warning("Curator onboarding failed because Gemini is unavailable: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                "message": (
+                    "The AI service is temporarily unavailable. "
+                    "Please try again shortly."
+                ),
+                "error_code": "LLM_UNAVAILABLE",
+            },
+        ) from exc
     except ValueError as exc:
         logger.exception("Curator onboarding validation failed.")
         raise HTTPException(
