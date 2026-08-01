@@ -7,11 +7,13 @@ const STARTER_PROMPTS = activeDomain.pages.mentor.starterPrompts;
 type StarterPromptsProps = {
   disabled: boolean;
   onSelect: (prompt: string) => void;
+  prompts?: readonly string[];
 };
 
 export function StarterPrompts({
   disabled,
   onSelect,
+  prompts = STARTER_PROMPTS,
 }: StarterPromptsProps) {
   return (
     <section className="mx-auto flex max-w-2xl flex-col items-center py-10 text-center">
@@ -25,11 +27,11 @@ export function StarterPrompts({
         {activeDomain.pages.mentor.welcomeDescription}
       </p>
       <div className="mt-7 grid w-full gap-3 sm:grid-cols-2">
-        {STARTER_PROMPTS.map((prompt) => (
+        {prompts.map((prompt, index) => (
           <button
             className="glass-control flex items-start gap-3 rounded-md p-4 text-left text-sm font-semibold leading-6 text-slate-800 transition hover:-translate-y-0.5 hover:border-blue-300 disabled:opacity-50"
             disabled={disabled}
-            key={prompt}
+            key={`${index}-${prompt}`}
             onClick={() => onSelect(prompt)}
             type="button"
           >

@@ -16,8 +16,11 @@ export function MilestoneCard({ milestones }: MilestoneCardProps) {
         <h4 className="text-sm font-semibold text-slate-950">Milestones</h4>
       </div>
       <ul className="space-y-2">
-        {milestones.map((milestone) => (
-          <li className="flex gap-2 text-sm leading-6 text-slate-700" key={milestone}>
+        {milestones.map((milestone, index) => (
+          <li
+            className="flex gap-2 text-sm leading-6 text-slate-700"
+            key={`${index}-${milestone}`}
+          >
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />
             <span>{milestone}</span>
           </li>

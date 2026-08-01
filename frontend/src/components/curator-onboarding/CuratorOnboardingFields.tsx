@@ -14,10 +14,10 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 export function TextField({ className, label, ...props }: TextFieldProps) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-slate-300">{label}</span>
+      <span className="text-sm font-semibold text-slate-700">{label}</span>
       <input
         className={cn(
-          "mt-2 h-12 w-full rounded-md border border-white/12 bg-white/8 px-4 text-sm font-medium text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:bg-white/12 focus:ring-2 focus:ring-cyan-300/20",
+          "mt-2 h-12 w-full rounded-[8px] border border-[#e8e8e8] bg-white px-4 text-sm font-medium text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200",
           className
         )}
         {...props}
@@ -37,10 +37,10 @@ export function TextAreaField({
 }: TextAreaFieldProps) {
   return (
     <label className="block">
-      <span className="text-sm font-semibold text-slate-300">{label}</span>
+      <span className="text-sm font-semibold text-slate-700">{label}</span>
       <textarea
         className={cn(
-          "mt-2 min-h-28 w-full resize-none rounded-md border border-white/12 bg-white/8 px-4 py-3 text-sm font-medium leading-6 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/70 focus:bg-white/12 focus:ring-2 focus:ring-cyan-300/20",
+          "mt-2 min-h-28 w-full resize-none rounded-[8px] border border-[#e8e8e8] bg-white px-4 py-3 text-sm font-medium leading-6 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200",
           className
         )}
         {...props}
@@ -68,10 +68,10 @@ export function OptionButton({
     <button
       aria-pressed={isSelected}
       className={cn(
-        "group flex min-h-16 items-center gap-3 rounded-md border p-3 text-left transition hover:-translate-y-0.5",
+        "group flex min-h-16 items-center gap-3 rounded-[8px] border p-3 text-left transition hover:-translate-y-0.5",
         isSelected
-          ? "border-cyan-300/70 bg-cyan-300/12 text-white shadow-[0_18px_44px_rgba(34,211,238,0.12)]"
-          : "border-white/12 bg-white/7 text-slate-300 hover:border-white/24 hover:bg-white/10"
+          ? "border-slate-950 bg-[#eeeeee] text-slate-950 shadow-[0_14px_28px_rgba(24,24,24,0.08)]"
+          : "border-[#e8e8e8] bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
       )}
       onClick={onClick}
       type="button"
@@ -81,8 +81,8 @@ export function OptionButton({
           className={cn(
             "flex h-10 w-10 shrink-0 items-center justify-center rounded-md border transition",
             isSelected
-              ? "border-cyan-200/50 bg-cyan-200/16 text-cyan-100"
-              : "border-white/10 bg-black/10 text-slate-400 group-hover:text-slate-100"
+              ? "border-slate-950 bg-slate-950 text-white"
+              : "border-slate-200 bg-slate-100 text-slate-500 group-hover:text-slate-950"
           )}
         >
           <Icon className="h-5 w-5" aria-hidden="true" />
@@ -91,7 +91,7 @@ export function OptionButton({
       <span className="min-w-0">
         <span className="block text-sm font-bold">{label}</span>
         {children ? (
-          <span className="mt-1 block text-xs font-medium leading-5 text-slate-400">
+          <span className="mt-1 block text-xs font-medium leading-5 text-slate-500">
             {children}
           </span>
         ) : null}
@@ -111,7 +111,7 @@ export function ErrorMessage({ error }: ErrorMessageProps) {
 
   return (
     <p
-      className="rounded-md border border-rose-300/20 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-100"
+      className="rounded-[8px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700"
       role="alert"
     >
       {error}

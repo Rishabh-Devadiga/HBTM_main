@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+from sqlalchemy import select
+
 from backend.database.crud import get_db_session
 from backend.database.models import CuratorIdentityProfile
 from backend.domains.curator.schemas.identity import IdentityProfile
@@ -53,6 +55,19 @@ class IdentityProfilePersistenceService:
 
         with get_db_session() as session:
             record = session.get(CuratorIdentityProfile, profile_id)
+            if record is None:
+                return None
+            return _to_persisted_profile(record)
+
+    def get_latest_identity_profile(self) -> PersistedIdentityProfile | None:
+        """Return the most recently persisted Curator identity profile."""
+
+        with get_db_session() as session:
+            statement = select(CuratorIdentityProfile).order_by(
+                CuratorIdentityProfile.created_at.desc(),
+                CuratorIdentityProfile.id.desc(),
+            )
+            record = session.scalars(statement).first()
             if record is None:
                 return None
             return _to_persisted_profile(record)

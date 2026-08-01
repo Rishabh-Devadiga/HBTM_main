@@ -8,14 +8,27 @@ import { PlanHeader } from "@/components/learning-plan/PlanHeader";
 import { useSession } from "@/context/SessionContext";
 import { activeDomain } from "@/domain";
 import {
+  useCompleteCuratorJourneyActivity,
+  useCuratorGrowthJourney,
+} from "@/hooks/useCuratorApi";
+import {
   searchYouTubeTutorials,
   YouTubeSearchError,
   type YouTubeVideo,
 } from "@/services/youtubeService";
-import type { LearningPhase } from "@/types/learning";
+import type { CuratorGrowthJourneyResponse } from "@/types/curator";
+import type { LearningPhase, LearningPlan } from "@/types/learning";
 import { getTopicKey } from "@/utils/learningPlan";
 
 export function LearningPlanPage() {
+  if (activeDomain.id === "curator") {
+    return <CuratorGrowthJourneyPage />;
+  }
+
+  return <LearningRoadmapPage />;
+}
+
+function LearningRoadmapPage() {
   const { state, toggleTopicCompletion } = useSession();
   const [searchParams] = useSearchParams();
   const plan = state.learningPlan;
@@ -209,8 +222,133 @@ export function LearningPlanPage() {
   );
 }
 
+function CuratorGrowthJourneyPage() {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("q")?.trim() ?? "";
+  const journeyQuery = useCuratorGrowthJourney();
+  const completeActivity = useCompleteCuratorJourneyActivity();
+  const journey = journeyQuery.data?.data ?? null;
+
+  if (journeyQuery.isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="glass-panel h-56 animate-pulse rounded-[28px]" />
+        <div className="grid gap-4">
+          <div className="glass-panel h-36 animate-pulse rounded-[22px]" />
+          <div className="glass-panel h-36 animate-pulse rounded-[22px]" />
+        </div>
+      </div>
+    );
+  }
+
+  if (journeyQuery.isError) {
+    return (
+      <section className="glass-panel rounded-[28px] p-6">
+        <p className="text-base font-black text-slate-950">
+          Unable to load growth journey
+        </p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+          {journeyQuery.error.message}
+        </p>
+      </section>
+    );
+  }
+
+  if (!journey) {
+    return <EmptyPlan />;
+  }
+
+  const plan = toLearningPlan(journey);
+  const completedTopics = toCompletedTopics(journey);
+  const filteredPhases = filterPhases(plan.phases, searchQuery);
+  const visibleTopicCount = filteredPhases.reduce(
+    (total, phase) => total + phase.recommended_topics.length,
+    0
+  );
+
+  return (
+    <div className="space-y-6">
+      <PlanHeader plan={plan} />
+
+      <section className="metric-card p-5">
+        <div className="flex gap-3">
+          <span className="glass-control inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-blue-600">
+            <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-sm font-black text-slate-500">Coach Note</p>
+            <p className="mt-2 text-sm font-medium leading-6 text-slate-600">
+              {journey.coachSummary}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <PhaseTimeline
+        completedTopics={completedTopics}
+        loadingTopics={{}}
+        onToggleTopic={(phaseNumber, topic, completed) => {
+          if (!completed) {
+            return;
+          }
+          const activity = journey.phases
+            .find((phase) => phase.phaseNumber === phaseNumber)
+            ?.activities.find((activity) => activity.task === topic);
+          if (activity?.status === "available") {
+            completeActivity.mutate(activity.id);
+          }
+        }}
+        phases={filteredPhases}
+        searchQuery={searchQuery}
+        visibleTopicCount={visibleTopicCount}
+        videos={{}}
+      />
+    </div>
+  );
+}
+
 function getTopicCacheKey(topic: string): string {
   return topic.trim().toLowerCase();
+}
+
+function toLearningPlan(journey: CuratorGrowthJourneyResponse): LearningPlan {
+  return {
+    learning_goal: journey.decision.currentFocus,
+    subject: journey.growthPlan.journey.growthTheme,
+    learner_level: journey.growthPlan.journey.currentStage,
+    total_available_time: journey.identityProfile.available_time,
+    target_deadline: journey.estimatedCompletion,
+    preferred_learning_style:
+      journey.growthPlan.curationStrategy.recommendedLearningStyle,
+    overview: journey.coachSummary,
+    phases: journey.phases.map((phase) => ({
+      phase_number: phase.phaseNumber,
+      title: phase.title,
+      objective: phase.summary,
+      recommended_topics: phase.activities.map((activity) => activity.task),
+      estimated_duration: phase.weekRange,
+      milestones: journey.growthPlan.weeklyMilestones
+        .filter((milestone) => milestone.week === phase.phaseNumber)
+        .map((milestone) => milestone.outcome),
+      suggested_resource_categories: phase.resources.map(
+        (resource) => `${resource.resourceType}: ${resource.title}`
+      ),
+    })),
+    final_milestone: journey.growthPlan.journey.destination,
+  };
+}
+
+function toCompletedTopics(
+  journey: CuratorGrowthJourneyResponse
+): Record<string, boolean> {
+  return Object.fromEntries(
+    journey.phases.flatMap((phase) =>
+      phase.activities.map((activity) => [
+        getTopicKey(phase.phaseNumber, activity.task),
+        activity.status === "completed",
+      ])
+    )
+  );
 }
 
 function filterPhases(phases: LearningPhase[], query: string): LearningPhase[] {

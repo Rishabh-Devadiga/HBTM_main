@@ -21,6 +21,9 @@ def main() -> int:
     try:
         from backend.database.database import Base, engine
         from backend.database.models import (  # noqa: F401
+            CuratorCoachConversation,
+            CuratorCoachMessage,
+            CuratorGrowthJourney,
             CuratorIdentityProfile,
             FeedbackHistory,
             LearnerIntent,

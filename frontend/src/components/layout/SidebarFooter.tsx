@@ -10,29 +10,29 @@ export function SidebarFooter() {
 
   return (
     <footer className="mt-auto pt-5">
-      <div className="rounded-[22px] bg-slate-950 p-4 text-white shadow-[0_18px_34px_rgba(15,23,42,0.18)]">
-        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+      <div className="rounded-[8px] bg-slate-950 p-4 text-white shadow-[0_18px_34px_rgba(24,24,24,0.18)]">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Current Goal
         </p>
-        <p className="mt-2 line-clamp-3 text-sm font-bold leading-5 text-white">
+        <p className="mt-2 line-clamp-3 text-sm font-semibold leading-5 text-white">
           {goal ?? "No active roadmap"}
         </p>
 
         <div className="mt-4 space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-400">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-400">
             <span>Progress</span>
             <span>{progress}%</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-blue-400 to-violet-400"
+              className="h-full rounded-full bg-white"
               style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}
             />
           </div>
         </div>
 
         <div className="mt-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Target Completion
           </p>
           <p className="mt-1 text-sm font-semibold text-slate-200">

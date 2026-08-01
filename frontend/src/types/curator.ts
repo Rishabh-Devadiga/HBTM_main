@@ -87,7 +87,97 @@ export type CuratorOnboardingResponse = {
     };
     aiSummary: string;
   };
+  decision: {
+    currentFocus: string;
+    recommendedAction: "learn" | "practice" | "reflect" | "build_habit" | "review";
+    recommendedResourceType: "youtube" | "article" | "book" | "podcast" | "course";
+    difficulty: "beginner" | "intermediate" | "advanced";
+    estimatedDurationMinutes: number;
+    priority: "low" | "medium" | "high";
+    reasoning: string;
+  };
 };
 
 export type CuratorOnboardingApiResponse =
   ApiSuccessResponse<CuratorOnboardingResponse>;
+
+export type CuratorJourneyActivity = {
+  id: string;
+  task: string;
+  durationMinutes: number;
+  status: "locked" | "available" | "completed";
+};
+
+export type CuratorJourneyPhase = {
+  phaseNumber: number;
+  title: string;
+  weekRange: string;
+  summary: string;
+  status: "completed" | "current" | "upcoming";
+  activities: CuratorJourneyActivity[];
+  resources: {
+    title: string;
+    resourceType: string;
+    purpose: string;
+  }[];
+  priorities: string[];
+};
+
+export type CuratorGrowthJourneyResponse = {
+  identityProfileId: number;
+  identityProfile: CuratorOnboardingResponse["identityProfile"];
+  growthPlan: CuratorOnboardingResponse["growthPlan"];
+  decision: CuratorOnboardingResponse["decision"];
+  phases: CuratorJourneyPhase[];
+  currentPhase: CuratorJourneyPhase;
+  todayActivity: CuratorJourneyActivity;
+  dailyActivities: CuratorJourneyActivity[];
+  currentPriorities: string[];
+  estimatedCompletion: string;
+  coachSummary: string;
+  progressPercentage: number;
+};
+
+export type CuratorGrowthJourneyApiResponse =
+  ApiSuccessResponse<CuratorGrowthJourneyResponse>;
+
+export type CuratorCoachMessage = {
+  id: number;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+};
+
+export type CuratorCoachConversationSummary = {
+  id: number;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CuratorCoachConversation =
+  CuratorCoachConversationSummary & {
+    messages: CuratorCoachMessage[];
+  };
+
+export type CuratorCoachConversationsResponse = {
+  identityProfileId: number;
+  conversations: CuratorCoachConversationSummary[];
+  activeConversation: CuratorCoachConversation | null;
+  suggestedPrompts: string[];
+};
+
+export type CuratorCoachChatResponse = {
+  conversation: CuratorCoachConversation;
+  reply: string;
+  suggestedPrompts: string[];
+};
+
+export type CuratorCoachConversationsApiResponse =
+  ApiSuccessResponse<CuratorCoachConversationsResponse>;
+
+export type CuratorCoachConversationApiResponse =
+  ApiSuccessResponse<CuratorCoachConversation>;
+
+export type CuratorCoachChatApiResponse =
+  ApiSuccessResponse<CuratorCoachChatResponse>;

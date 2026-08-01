@@ -47,7 +47,7 @@ export function PhaseTimeline({
             .map((phase) => (
               <PhaseCard
                 completedTopics={completedTopics}
-                key={`${phase.phase_number}-${phase.title}`}
+                key={phase.phase_number}
                 loadingTopics={loadingTopics}
                 onToggleTopic={onToggleTopic}
                 phase={phase}

@@ -11,28 +11,28 @@ type SidebarProps = {
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   return (
-    <aside className="glass-panel flex h-full w-[224px] shrink-0 flex-col rounded-[24px] p-3 text-slate-950">
-      <div className="p-2 pb-5">
+    <aside className="flex h-full w-[220px] shrink-0 flex-col bg-white p-4 text-slate-950">
+      <div className="pb-6 pt-1">
         <Link
-          className="group flex items-center gap-3 rounded-[20px] px-2 py-2 transition hover:bg-white/50"
+          className="group flex items-center gap-3 rounded-[8px] px-1 py-2 transition hover:bg-slate-100"
           onClick={onNavigate}
           to="/"
         >
-          <span className="blue-pill flex h-10 w-10 items-center justify-center rounded-[16px] text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-slate-950 text-white">
             <GraduationCap className="h-5 w-5" aria-hidden="true" />
           </span>
           <span>
-            <span className="block text-base font-black tracking-tight text-slate-950">
+            <span className="block text-lg font-semibold tracking-tight text-slate-950">
               {activeDomain.application.name}
             </span>
-            <span className="block text-xs font-semibold text-slate-500">
+            <span className="block text-xs font-medium text-slate-500">
               {activeDomain.application.workspaceName}
             </span>
           </span>
         </Link>
       </div>
 
-      <p className="px-3 pb-2 text-[11px] font-bold uppercase text-slate-400">
+      <p className="px-2 pb-2 text-[11px] font-semibold uppercase text-slate-400">
         Menu
       </p>
       <nav

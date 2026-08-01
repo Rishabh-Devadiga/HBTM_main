@@ -6,6 +6,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.domains.curator.schemas.decision import Decision
 from backend.domains.curator.schemas.identity import IdentityProfile
 from backend.domains.curator.schemas.planner import GrowthPlan
 
@@ -103,3 +104,4 @@ class CuratorOnboardingResponse(BaseModel):
     identityProfileId: int
     identityProfile: IdentityProfile
     growthPlan: GrowthPlan
+    decision: Decision

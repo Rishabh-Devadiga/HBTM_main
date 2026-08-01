@@ -3,6 +3,7 @@ import type { ApiSuccessResponse } from "@/types/api";
 export type MentorRole = "user" | "assistant";
 
 export type MentorMessage = {
+  id?: number;
   role: MentorRole;
   content: string;
 };

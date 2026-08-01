@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from crewai import Agent
+from crewai import Agent, Crew, Process, Task
 
 from backend.domains.curator.prompts import load_prompt_block
 from backend.domains.curator.schemas.identity import IdentityProfile
@@ -16,7 +16,7 @@ from backend.domains.curator.schemas.planner import (
     SuccessMetrics,
     WeeklyMilestone,
 )
-from backend.framework.agents.base_agent import create_base_agent, run_structured_agent
+from backend.framework.agents.base_agent import create_base_agent, run_with_gemini_retry
 from backend.framework.base.config import get_settings
 
 
@@ -38,6 +38,23 @@ def create_planner_agent() -> Agent:
     )
 
 
+def create_planner_task(
+    *,
+    planner_agent: Agent,
+    identity_profile: IdentityProfile,
+) -> Task:
+    """Create the Planner task with the Identity Agent output as its input."""
+
+    return Task(
+        description=GROWTH_PLAN_PROMPT.format(
+            identity_profile_json=identity_profile.model_dump_json(indent=2)
+        ),
+        expected_output="A structured GrowthPlan object grounded in the Identity Profile.",
+        agent=planner_agent,
+        output_pydantic=GrowthPlan,
+    )
+
+
 def generate_growth_plan(
     identity_profile: IdentityProfile,
     agent: Agent | None = None,
@@ -48,16 +65,27 @@ def generate_growth_plan(
         return _generate_mock_growth_plan(identity_profile)
 
     planner_agent = agent or create_planner_agent()
-    prompt = GROWTH_PLAN_PROMPT.format(
-        identity_profile_json=identity_profile.model_dump_json(indent=2)
+    planner_task = create_planner_task(
+        planner_agent=planner_agent,
+        identity_profile=identity_profile,
     )
-    return run_structured_agent(
-        operation="Curator Planner Agent",
-        agent=planner_agent,
-        prompt=prompt,
-        response_model=GrowthPlan,
-        missing_output_error="Planner Agent did not return structured output.",
+    crew = Crew(
+        agents=[planner_agent],
+        tasks=[planner_task],
+        process=Process.sequential,
+        verbose=False,
     )
+    result = run_with_gemini_retry(
+        "Curator Planner Agent",
+        lambda: crew.kickoff(),
+        prompt=planner_task.description,
+    )
+    pydantic_output = getattr(result, "pydantic", None)
+    if pydantic_output is None and getattr(planner_task, "output", None) is not None:
+        pydantic_output = planner_task.output.pydantic
+    if pydantic_output is None:
+        raise ValueError("Planner Agent did not return structured output.")
+    return pydantic_output
 
 
 def _generate_mock_growth_plan(identity_profile: IdentityProfile) -> GrowthPlan:
