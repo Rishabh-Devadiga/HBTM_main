@@ -1,7 +1,9 @@
+import { curatorDomain } from "@/domain/domains/curator";
 import { learningDomain } from "@/domain/domains/learning";
 import type { DomainConfig } from "@/domain/types";
 
 const domainRegistry: Record<string, DomainConfig> = {
+  [curatorDomain.id]: curatorDomain,
   [learningDomain.id]: learningDomain,
 };
 
