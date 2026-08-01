@@ -4,6 +4,8 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { AIMentorPage } from "@/pages/AIMentorPage";
 import { ApiTestPage } from "@/pages/ApiTestPage";
 import { ChatPage } from "@/pages/ChatPage";
+import { CuratorOnboardingPage } from "@/pages/CuratorOnboardingPage";
+import { CuratorOnboardingSuccessPage } from "@/pages/CuratorOnboardingSuccessPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { FeedbackNudgesPage } from "@/pages/FeedbackNudgesPage";
 import { HomePage } from "@/pages/HomePage";
@@ -12,13 +14,37 @@ import { MockInterviewPage } from "@/pages/MockInterviewPage";
 import { OnboardingPage } from "@/pages/OnboardingPage";
 import { ProgressPage } from "@/pages/ProgressPage";
 import { QuizPage } from "@/pages/QuizPage";
+import { activeDomain } from "@/domain";
 
 export default function App() {
   return (
     <Routes>
+      <Route path="curator/onboarding" element={<CuratorOnboardingPage />} />
+      <Route
+        path="curator/onboarding/success"
+        element={<CuratorOnboardingSuccessPage />}
+      />
       <Route element={<AppLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="onboarding" element={<OnboardingPage />} />
+        <Route
+          index
+          element={
+            activeDomain.id === "curator" ? (
+              <Navigate to="/curator/onboarding" replace />
+            ) : (
+              <HomePage />
+            )
+          }
+        />
+        <Route
+          path="onboarding"
+          element={
+            activeDomain.id === "curator" ? (
+              <CuratorOnboardingPage />
+            ) : (
+              <OnboardingPage />
+            )
+          }
+        />
         <Route path="chat" element={<ChatPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="learning-plan" element={<LearningPlanPage />} />

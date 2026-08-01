@@ -22,6 +22,6 @@ register_domain(
     DomainRegistration(
         name="curator",
         package="backend.domains.curator",
-        api_router_modules=(),
+        api_router_modules=("backend.domains.curator.api.onboarding",),
     ),
 )
