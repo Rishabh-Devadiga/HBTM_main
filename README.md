@@ -3,6 +3,7 @@
 Agentic AI Starter is a domain-configurable foundation for building agentic AI
 applications with FastAPI, CrewAI, Gemini, PostgreSQL, and React.
 
+
 The reusable framework is separated from domain-owned prompts, schemas, agents,
 workflows, API routers, and frontend presentation. The included Learning domain
 is the default reference implementation.
