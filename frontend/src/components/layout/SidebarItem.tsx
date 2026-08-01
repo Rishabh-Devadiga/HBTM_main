@@ -29,15 +29,15 @@ export function SidebarItem({
       className={cn(
         "group flex min-h-10 items-center gap-3 rounded-[8px] px-2 text-sm font-semibold transition-all duration-200",
         isActive
-          ? "bg-[#eeeeee] text-slate-950"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 hover:translate-x-0.5"
+          ? "rounded-full bg-slate-950 text-white shadow-[0_12px_24px_rgba(24,24,24,0.16)]"
+          : "rounded-full bg-white text-slate-700 hover:bg-slate-950 hover:text-white hover:translate-x-0.5"
       )}
       end={end}
       onClick={onClick}
       to={to}
     >
       <Icon
-        className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110"
+        className="h-4 w-4 shrink-0 transition duration-200 group-hover:scale-110"
         aria-hidden="true"
       />
       <span>{label}</span>

@@ -16,7 +16,7 @@ import { cn } from "@/utils/cn";
 
 export function HomePage() {
   return (
-    <main className="workspace-shell min-h-screen overflow-hidden bg-[#bdbdbd] text-slate-950">
+    <main className="workspace-shell min-h-screen overflow-hidden bg-[#e8eff9] text-slate-950">
       <header className="border-b border-slate-200/80 bg-white/45">
         <nav className="app-container flex h-16 items-center justify-between gap-4">
           <Link className="flex items-center gap-3" to="/">

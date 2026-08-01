@@ -33,7 +33,6 @@ export const learningDomain: DomainConfig = {
         icon: BriefcaseBusiness,
       },
       { label: "Progress", path: "/progress", icon: TrendingUp },
-      { label: "Feedback", path: "/feedback", icon: MessageCircle },
     ],
   },
   features: {

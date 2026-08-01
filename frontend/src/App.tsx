@@ -99,7 +99,7 @@ export default function App() {
         <Route path="quiz" element={<QuizPage />} />
         <Route path="mentor" element={<AIMentorPage />} />
         <Route path="interview" element={<MockInterviewPage />} />
-        <Route path="feedback" element={<FeedbackNudgesPage />} />
+        <Route path="feedback" element={<Navigate to="/dashboard" replace />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="opportunities" element={<OpportunitiesPage />} />
@@ -114,7 +114,7 @@ export default function App() {
 function PublicOnly({ children }: { children: ReactNode }) {
   const auth = useAuth();
   if (auth.isLoading) {
-    return <div className="min-h-screen bg-[#bdbdbd]" />;
+    return <div className="min-h-screen bg-[#e8eff9]" />;
   }
   if (auth.isAuthenticated) {
     return (
@@ -138,7 +138,7 @@ function RequireAuth({
   const location = useLocation();
 
   if (auth.isLoading) {
-    return <div className="min-h-screen bg-[#bdbdbd]" />;
+    return <div className="min-h-screen bg-[#e8eff9]" />;
   }
   if (!auth.isAuthenticated) {
     return <Navigate replace state={{ from: location.pathname }} to="/" />;

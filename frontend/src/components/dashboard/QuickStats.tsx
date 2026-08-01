@@ -10,31 +10,41 @@ import { activeDomain } from "@/domain";
 
 type QuickStatsProps = {
   completedTopics: number;
+  progressPercentage: number;
   totalTopics: number;
 };
 
-export function QuickStats({ completedTopics, totalTopics }: QuickStatsProps) {
+export function QuickStats({
+  completedTopics,
+  progressPercentage,
+  totalTopics,
+}: QuickStatsProps) {
   const completion =
     totalTopics === 0 ? 0 : Math.round((completedTopics / totalTopics) * 100);
+  const growthScore = Math.min(
+    100,
+    Math.max(progressPercentage, completion, completedTopics * 10)
+  );
   const stats: Array<{
     detail: string;
     icon: LucideIcon;
     label: string;
-    primary?: boolean;
     value: string;
   }> = [
     {
       detail: `${completion}% completed`,
       icon: BookOpenCheck,
       label: activeDomain.dashboard.topicsCompleted,
-      primary: true,
       value: `${completedTopics} / ${totalTopics}`,
     },
     {
-      detail: "Complete a quiz to begin",
+      detail:
+        completedTopics === 0
+          ? "Complete actions to raise it"
+          : "Rises as you finish actions",
       icon: ClipboardCheck,
       label: activeDomain.dashboard.quizAverage,
-      value: "-",
+      value: `${growthScore}`,
     },
     {
       detail: activeDomain.dashboard.noCompletedInterviews,
@@ -52,40 +62,30 @@ export function QuickStats({ completedTopics, totalTopics }: QuickStatsProps) {
 
   return (
     <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map(({ detail, icon: Icon, label, primary, value }) => (
+      {stats.map(({ detail, icon: Icon, label, value }) => (
         <article
-          className={`min-h-36 p-5 transition hover:-translate-y-1 ${
-            primary ? "metric-card-primary" : "metric-card"
-          }`}
+          className="metric-card group min-h-36 rounded-[18px] p-5 transition hover:-translate-y-1 active:translate-y-0"
           key={label}
         >
           <div className="flex items-center gap-3">
             <span
-              className={`flex h-10 w-10 items-center justify-center rounded-[15px] ${
-                primary ? "bg-white/95 text-blue-600" : "blue-pill text-white"
-              }`}
+              className="flex h-10 w-10 items-center justify-center rounded-[15px] bg-slate-950 text-white transition"
             >
               <Icon className="h-5 w-5" aria-hidden="true" />
             </span>
             <p
-              className={`text-sm font-bold ${
-                primary ? "text-blue-50" : "text-slate-500"
-              }`}
+              className="text-sm font-bold text-slate-500 transition"
             >
               {label}
             </p>
           </div>
           <p
-            className={`mt-4 text-3xl font-black ${
-              primary ? "text-white" : "text-slate-950"
-            }`}
+            className="mt-4 text-3xl font-black text-slate-950 transition"
           >
             {value}
           </p>
           <p
-            className={`mt-2 text-xs font-semibold ${
-              primary ? "text-blue-100" : "text-slate-500"
-            }`}
+            className="mt-2 text-xs font-semibold text-slate-500 transition"
           >
             {detail}
           </p>

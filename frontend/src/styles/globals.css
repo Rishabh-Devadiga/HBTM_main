@@ -13,7 +13,7 @@
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    background: #bdbdbd;
+    background: #e8eff9;
     color: #191919;
     font-family:
       ui-sans-serif,
@@ -170,7 +170,7 @@
 
   .workspace-shell {
     color-scheme: light;
-    background: #bdbdbd;
+    background: #e8eff9;
     transition:
       background-color 340ms ease,
       color 260ms ease;

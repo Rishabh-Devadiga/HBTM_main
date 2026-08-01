@@ -62,13 +62,13 @@ export function AppLayout() {
     <div
       className={cn(
         "workspace-shell min-h-screen overflow-x-hidden px-3 py-4 text-slate-950 sm:px-5 lg:px-7",
-        theme === "dark" ? "dark-workspace bg-[#202020]" : "bg-[#bdbdbd]"
+        theme === "dark" ? "dark-workspace bg-[#202020]" : "bg-[#e8eff9]"
       )}
     >
       <div
         className={cn(
           "relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1480px] overflow-hidden rounded-[8px] shadow-[0_24px_70px_rgba(30,30,30,0.12)]",
-          theme === "dark" ? "bg-[#252525]" : "bg-[#d4d4d4]"
+          theme === "dark" ? "bg-[#252525]" : "bg-[#f5f7fb]"
         )}
       >
         <div className="hidden shrink-0 lg:block">

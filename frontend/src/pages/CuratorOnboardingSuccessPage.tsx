@@ -16,7 +16,7 @@ export function CuratorOnboardingSuccessPage() {
     ?.onboardingData;
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#bdbdbd] px-4 py-10 text-slate-950">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#e8eff9] px-4 py-10 text-slate-950">
       <section className="w-full max-w-2xl rounded-[8px] border border-[#e2e2e2] bg-white p-6 text-center shadow-[0_24px_70px_rgba(36,36,36,0.14)] sm:p-9">
         <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-[8px] bg-slate-950 text-white shadow-[0_14px_28px_rgba(24,24,24,0.14)]">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />

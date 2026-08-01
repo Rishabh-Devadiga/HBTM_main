@@ -1,9 +1,24 @@
-import { BarChart3, BriefcaseBusiness } from "lucide-react";
+import { ArrowRight, Target, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { activeDomain } from "@/domain";
 
-export function InterviewAnalytics() {
+type InterviewAnalyticsProps = {
+  learningGoal: string | null;
+  progressPercentage: number;
+  task: string | null;
+};
+
+export function InterviewAnalytics({
+  learningGoal,
+  progressPercentage,
+  task,
+}: InterviewAnalyticsProps) {
+  const challenge =
+    task ??
+    learningGoal ??
+    "Choose one small growth action and complete it before the day ends.";
+
   return (
     <section className="metric-card flex h-full min-h-72 flex-col p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
@@ -12,34 +27,36 @@ export function InterviewAnalytics() {
             {activeDomain.dashboard.interviewAnalytics}
           </h2>
           <p className="mt-0.5 text-xs font-semibold text-slate-500">
-            Performance overview
+            One helpful action for this week
           </p>
         </div>
         <span className="glass-control flex h-10 w-10 items-center justify-center rounded-full text-blue-600">
-          <BarChart3 className="h-5 w-5" aria-hidden="true" />
+          <Target className="h-5 w-5" aria-hidden="true" />
         </span>
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center py-7 text-center">
         <span className="glass-control flex h-14 w-14 items-center justify-center rounded-full text-slate-500">
-          <BriefcaseBusiness className="h-6 w-6" aria-hidden="true" />
+          <Trophy className="h-6 w-6" aria-hidden="true" />
         </span>
         <h3 className="mt-4 text-sm font-black text-slate-950">
-          {activeDomain.dashboard.noInterviewData}
+          {challenge}
         </h3>
         <p className="mt-2 max-w-sm text-xs font-semibold leading-5 text-slate-500">
-          {activeDomain.dashboard.interviewEmptyDescription}
+          Complete this once, then write a short reflection about what made it
+          easier or harder. Your growth score is currently {progressPercentage}%.
         </p>
         <Link
           className="blue-pill mt-5 inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-black text-white"
-          to="/interview"
+          to="/learning-plan"
         >
           {activeDomain.dashboard.startInterview}
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
 
       <p className="border-t border-slate-200/80 pt-4 text-xs font-bold text-slate-400">
-        Last updated: No interview data
+        This week: one focused action plus one reflection
       </p>
     </section>
   );

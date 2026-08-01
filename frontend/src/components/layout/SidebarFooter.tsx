@@ -1,16 +1,40 @@
+import { useEffect, useState } from "react";
+
 import { useSession } from "@/context/SessionContext";
 
 export function SidebarFooter() {
   const { state } = useSession();
+  const [scrollOffset, setScrollOffset] = useState(0);
   const goal =
     state.intent?.learning_goal ?? state.learningPlan?.learning_goal ?? null;
   const progress = state.progress?.overall_completion_percentage ?? 0;
   const targetDate =
     state.intent?.target_deadline ?? state.learningPlan?.target_deadline ?? null;
 
+  useEffect(() => {
+    let frameId = 0;
+
+    function updateOffset() {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(() => {
+        setScrollOffset(Math.min(window.scrollY, 420));
+      });
+    }
+
+    updateOffset();
+    window.addEventListener("scroll", updateOffset, { passive: true });
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", updateOffset);
+    };
+  }, []);
+
   return (
-    <footer className="mt-auto pt-5">
-      <div className="rounded-[8px] bg-slate-950 p-4 text-white shadow-[0_18px_34px_rgba(24,24,24,0.18)]">
+    <footer className="pt-5">
+      <div
+        className="rounded-[8px] bg-slate-950 p-4 text-white shadow-[0_18px_34px_rgba(24,24,24,0.18)] transition-transform duration-300 ease-out"
+        style={{ transform: `translateY(${scrollOffset}px)` }}
+      >
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Current Goal
         </p>
