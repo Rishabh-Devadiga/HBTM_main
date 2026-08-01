@@ -1,4 +1,4 @@
-"""Validation-only Curator onboarding workflow."""
+"""Curator onboarding workflow."""
 
 from __future__ import annotations
 
@@ -8,19 +8,22 @@ from backend.domains.curator.schemas.onboarding import (
     CuratorOnboardingRequest,
     CuratorOnboardingResponse,
 )
+from backend.domains.curator.agents.identity_agent import generate_identity_profile
 
 
 class CuratorOnboardingWorkflow:
-    """Validate Curator onboarding input without invoking agents or persistence."""
+    """Validate onboarding input and generate the Curator identity profile."""
 
     def run(self, request: CuratorOnboardingRequest) -> CuratorOnboardingResponse:
-        """Validate the request and return a successful onboarding response."""
+        """Validate the request and return an identity-profile response."""
 
         self._validate_request(request)
+        identity_profile = generate_identity_profile(request)
         return CuratorOnboardingResponse(
             message="Curator onboarding completed successfully.",
             nextRoute="/curator/onboarding/success",
             submittedAt=datetime.now(UTC),
+            identityProfile=identity_profile,
         )
 
     def _validate_request(self, request: CuratorOnboardingRequest) -> None:

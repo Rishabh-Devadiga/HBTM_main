@@ -6,6 +6,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 
+from backend.domains.curator.schemas.identity import IdentityProfile
+
 
 class CuratorIdentity(BaseModel):
     """Basic identity details captured during onboarding."""
@@ -97,3 +99,4 @@ class CuratorOnboardingResponse(BaseModel):
     message: str
     nextRoute: str
     submittedAt: datetime
+    identityProfile: IdentityProfile

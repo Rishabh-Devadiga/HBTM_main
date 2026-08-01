@@ -12,7 +12,7 @@ from backend.domains.curator.workflows.onboarding_workflow import (
 
 
 class CuratorOnboardingService:
-    """Coordinate Curator onboarding without persistence or agent execution."""
+    """Coordinate Curator onboarding without persistence."""
 
     def __init__(self, workflow: CuratorOnboardingWorkflow | None = None) -> None:
         self.workflow = workflow or CuratorOnboardingWorkflow()

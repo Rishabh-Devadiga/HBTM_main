@@ -38,6 +38,18 @@ export type CuratorOnboardingResponse = {
   message: string;
   nextRoute: string;
   submittedAt: string;
+  identityProfile: {
+    current_identity: string;
+    desired_future_identity: string;
+    core_interests: string[];
+    growth_themes: string[];
+    strengths: string[];
+    growth_opportunities: string[];
+    learning_preferences: string[];
+    coach_preferences: string[];
+    available_time: string;
+    initial_personalization_summary: string;
+  };
 };
 
 export type CuratorOnboardingApiResponse =
