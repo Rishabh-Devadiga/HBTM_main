@@ -3,10 +3,13 @@ import type {
   AuthApiResponse,
   AuthStatusApiResponse,
   RegisterApiResponse,
+  UpdatePasswordPayload,
+  UpdateProfilePayload,
 } from "@/types/auth";
 
 export async function registerCuratorUser(payload: {
   name: string;
+  username: string;
   email: string;
   password: string;
 }): Promise<RegisterApiResponse> {
@@ -18,11 +21,31 @@ export async function registerCuratorUser(payload: {
 }
 
 export async function loginCuratorUser(payload: {
-  email: string;
+  identifier: string;
   password: string;
 }): Promise<AuthApiResponse> {
   const response = await apiClient.post<AuthApiResponse>(
     "/curator/auth/login",
+    payload
+  );
+  return response.data;
+}
+
+export async function updateCuratorProfile(
+  payload: UpdateProfilePayload
+): Promise<AuthStatusApiResponse> {
+  const response = await apiClient.patch<AuthStatusApiResponse>(
+    "/curator/auth/profile",
+    payload
+  );
+  return response.data;
+}
+
+export async function updateCuratorPassword(
+  payload: UpdatePasswordPayload
+): Promise<AuthStatusApiResponse> {
+  const response = await apiClient.patch<AuthStatusApiResponse>(
+    "/curator/auth/password",
     payload
   );
   return response.data;

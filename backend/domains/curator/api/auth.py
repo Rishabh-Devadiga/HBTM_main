@@ -11,6 +11,8 @@ from backend.domains.curator.schemas.auth import (
     CuratorAuthStatusResponse,
     CuratorAppleLoginRequest,
     CuratorLoginRequest,
+    CuratorPasswordUpdateRequest,
+    CuratorProfileUpdateRequest,
     CuratorRegisterRequest,
     CuratorRegisterResponse,
     CuratorSocialLoginRequest,
@@ -69,6 +71,7 @@ async def register_curator_user(
         user = await run_in_threadpool(
             service.register,
             name=request.name,
+            username=request.username,
             email=request.email,
             password=request.password,
         )
@@ -98,7 +101,7 @@ async def login_curator_user(
     try:
         token, user, onboarding_completed = await run_in_threadpool(
             service.login,
-            email=request.email,
+            identifier=request.identifier,
             password=request.password,
         )
     except ValueError as exc:
@@ -172,6 +175,72 @@ async def login_curator_user_with_apple(
             token=token,
             user=user,
             onboardingCompleted=onboarding_completed,
+        ),
+    )
+
+
+@router.patch(
+    "/profile",
+    response_model=SuccessResponse[CuratorAuthStatusResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def update_curator_profile(
+    request: CuratorProfileUpdateRequest,
+    auth_user: AuthenticatedUser = Depends(get_current_curator_user),
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthStatusResponse]:
+    try:
+        user = await run_in_threadpool(
+            service.update_profile,
+            user_id=auth_user.user.id,
+            name=request.name,
+            username=request.username,
+            email=request.email,
+            avatar_url=request.avatarUrl,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": str(exc), "error_code": "profile_update_failed"},
+        ) from exc
+    return SuccessResponse(
+        message="Profile updated.",
+        data=CuratorAuthStatusResponse(
+            authenticated=True,
+            user=user,
+            onboardingCompleted=auth_user.onboarding_completed,
+        ),
+    )
+
+
+@router.patch(
+    "/password",
+    response_model=SuccessResponse[CuratorAuthStatusResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def update_curator_password(
+    request: CuratorPasswordUpdateRequest,
+    auth_user: AuthenticatedUser = Depends(get_current_curator_user),
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthStatusResponse]:
+    try:
+        await run_in_threadpool(
+            service.update_password,
+            user_id=auth_user.user.id,
+            current_password=request.currentPassword,
+            new_password=request.newPassword,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": str(exc), "error_code": "password_update_failed"},
+        ) from exc
+    return SuccessResponse(
+        message="Password updated.",
+        data=CuratorAuthStatusResponse(
+            authenticated=True,
+            user=service._to_auth_user(auth_user.user),
+            onboardingCompleted=auth_user.onboarding_completed,
         ),
     )
 

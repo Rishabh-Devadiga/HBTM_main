@@ -11,6 +11,7 @@ export function RegisterPage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export function RegisterPage() {
     setError(null);
     setIsSubmitting(true);
     try {
-      await auth.register({ name, email, password });
+      await auth.register({ name, username, email, password });
       navigate("/login", { replace: true, state: { registered: true } });
     } catch (requestError) {
       setError(
@@ -55,6 +56,16 @@ export function RegisterPage() {
             onChange={(event) => setName(event.target.value)}
             required
             value={name}
+          />
+        </label>
+        <label className="mt-4 block text-sm font-semibold text-slate-700">
+          Username
+          <input
+            className="mt-2 h-12 w-full rounded-[8px] border border-slate-200 px-4 text-sm"
+            onChange={(event) => setUsername(event.target.value)}
+            pattern="[A-Za-z0-9_.-]+"
+            required
+            value={username}
           />
         </label>
         <label className="mt-4 block text-sm font-semibold text-slate-700">

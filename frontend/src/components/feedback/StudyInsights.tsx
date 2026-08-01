@@ -40,7 +40,7 @@ export function StudyInsights({
         <span className="blue-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white">
           <BarChart3 className="h-5 w-5" aria-hidden="true" />
         </span>
-        <h2 className="text-base font-black text-slate-950">Study Insights</h2>
+        <h2 className="text-base font-black text-slate-950">Daily Insights</h2>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {insights.map((item) => (

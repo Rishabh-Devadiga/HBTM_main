@@ -16,9 +16,15 @@ import {
   loginCuratorUser,
   logoutCuratorUser,
   registerCuratorUser,
+  updateCuratorPassword,
+  updateCuratorProfile,
 } from "@/api/authApi";
 import { setAuthToken } from "@/api/apiClient";
-import type { AuthUser } from "@/types/auth";
+import type {
+  AuthUser,
+  UpdatePasswordPayload,
+  UpdateProfilePayload,
+} from "@/types/auth";
 
 const AUTH_TOKEN_KEY = "saarthi-auth-token";
 
@@ -27,14 +33,17 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   onboardingCompleted: boolean;
   user: AuthUser | null;
-  login: (payload: { email: string; password: string }) => Promise<boolean>;
+  login: (payload: { identifier: string; password: string }) => Promise<boolean>;
   loginWithGoogle: (payload: { idToken?: string; code?: string }) => Promise<boolean>;
   loginWithApple: (payload: { idToken: string; name?: string }) => Promise<boolean>;
   register: (payload: {
     name: string;
+    username: string;
     email: string;
     password: string;
   }) => Promise<void>;
+  updateProfile: (payload: UpdateProfilePayload) => Promise<void>;
+  updatePassword: (payload: UpdatePasswordPayload) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 };
@@ -81,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(timeoutId);
   }, [refresh]);
 
-  const login = useCallback(async (payload: { email: string; password: string }) => {
+  const login = useCallback(async (payload: { identifier: string; password: string }) => {
     const response = await loginCuratorUser(payload);
     localStorage.setItem(AUTH_TOKEN_KEY, response.data.token);
     setAuthToken(response.data.token);
@@ -115,11 +124,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback(
-    async (payload: { name: string; email: string; password: string }) => {
+    async (payload: {
+      name: string;
+      username: string;
+      email: string;
+      password: string;
+    }) => {
       await registerCuratorUser(payload);
     },
     []
   );
+
+  const updateProfile = useCallback(async (payload: UpdateProfilePayload) => {
+    const response = await updateCuratorProfile(payload);
+    setUser(response.data.user);
+    setOnboardingCompleted(response.data.onboardingCompleted);
+  }, []);
+
+  const updatePassword = useCallback(async (payload: UpdatePasswordPayload) => {
+    const response = await updateCuratorPassword(payload);
+    setUser(response.data.user);
+    setOnboardingCompleted(response.data.onboardingCompleted);
+  }, []);
 
   const logout = useCallback(async () => {
     try {
@@ -145,6 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       refresh,
+      updatePassword,
+      updateProfile,
     }),
     [
       isLoading,
@@ -155,6 +183,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onboardingCompleted,
       refresh,
       register,
+      updatePassword,
+      updateProfile,
       user,
     ]
   );
