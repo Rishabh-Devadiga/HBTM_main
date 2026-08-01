@@ -27,10 +27,10 @@ export function SidebarItem({
   return (
     <NavLink
       className={cn(
-        "group flex min-h-11 items-center gap-3 rounded-[14px] px-3 text-sm font-bold transition-all duration-200",
+        "group flex min-h-10 items-center gap-3 rounded-[8px] px-2 text-sm font-semibold transition-all duration-200",
         isActive
-          ? "blue-pill text-white"
-          : "text-slate-600 hover:bg-white/60 hover:text-slate-950 hover:translate-x-0.5"
+          ? "bg-[#eeeeee] text-slate-950"
+          : "text-slate-600 hover:bg-slate-100 hover:text-slate-950 hover:translate-x-0.5"
       )}
       end={end}
       onClick={onClick}

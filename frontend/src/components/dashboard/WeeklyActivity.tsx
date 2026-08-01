@@ -25,7 +25,7 @@ export function WeeklyActivity() {
     <section className="metric-card h-full min-h-72 p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="font-black text-slate-950">Study Habits</h2>
+          <h2 className="font-black text-slate-950">Daily Progress</h2>
           <p className="mt-0.5 text-xs font-semibold text-slate-500">
             Example activity until history is available
           </p>
@@ -53,7 +53,7 @@ export function WeeklyActivity() {
                 color: "#fff",
                 boxShadow: "0 16px 40px rgba(15,23,42,0.22)",
               }}
-              cursor={{ fill: "rgba(64,88,255,0.06)" }}
+              cursor={{ fill: "rgba(42,42,42,0.06)" }}
               formatter={(value) => [
                 `${String(value)} min`,
                 activeDomain.dashboard.activitySeriesLabel,
@@ -61,7 +61,7 @@ export function WeeklyActivity() {
             />
             <Bar
               dataKey="minutes"
-              fill="#3f51ff"
+              fill="#2a2a2a"
               maxBarSize={30}
               radius={[10, 10, 10, 10]}
             />

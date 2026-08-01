@@ -18,10 +18,10 @@ export function ResourceList({ resources }: ResourceListProps) {
         </h4>
       </div>
       <div className="flex flex-wrap gap-2">
-        {resources.map((resource) => (
+        {resources.map((resource, index) => (
           <span
             className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700"
-            key={resource}
+            key={`${index}-${resource}`}
           >
             {resource}
           </span>

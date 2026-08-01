@@ -203,3 +203,77 @@ class CuratorIdentityProfile(Base):
     )
 
     user: Mapped[User | None] = relationship(back_populates="curator_identity_profiles")
+
+
+class CuratorGrowthJourney(Base):
+    """Persisted Curator growth journey and progress state."""
+
+    __tablename__ = "curator_growth_journeys"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        unique=True,
+        index=True,
+        nullable=False,
+    )
+    growth_plan_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    decision_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    journey_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    progress_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorCoachConversation(Base):
+    """Persistent Curator Growth Coach conversation."""
+
+    __tablename__ = "curator_coach_conversations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorCoachMessage(Base):
+    """One persistent message in a Curator Growth Coach conversation."""
+
+    __tablename__ = "curator_coach_messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    conversation_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_coach_conversations.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    role: Mapped[str] = mapped_column(String(24), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )

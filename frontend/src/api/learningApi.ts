@@ -1,4 +1,5 @@
 import { apiClient } from "@/api/apiClient";
+import { activeDomain } from "@/domain";
 import type {
   FeedbackApiResponse,
   LearnerIntentApiResponse,
@@ -13,8 +14,12 @@ import type {
 export async function startLearningSession(
   payload: LearningSessionRequest
 ): Promise<LearningSessionApiResponse> {
+  const sessionPath =
+    activeDomain.id === "curator"
+      ? "/curator/growth-journey/session"
+      : "/learning/session";
   const response = await apiClient.post<LearningSessionApiResponse>(
-    "/learning/session",
+    sessionPath,
     payload
   );
   return response.data;

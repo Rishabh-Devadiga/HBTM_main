@@ -34,7 +34,7 @@ export function TodaysGoal({
         <div
           className="grid h-32 w-32 place-items-center rounded-full"
           style={{
-            background: `conic-gradient(#4058ff ${normalizedProgress * 3.6}deg, #e3e6ef 0deg)`,
+            background: `conic-gradient(#2a2a2a ${normalizedProgress * 3.6}deg, #e3e3e3 0deg)`,
           }}
         >
           <div className="grid h-24 w-24 place-items-center rounded-full bg-white shadow-inner">

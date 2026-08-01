@@ -45,9 +45,18 @@ export function AppLayout() {
   }
 
   return (
-    <div className={`workspace-shell min-h-screen overflow-x-hidden px-3 py-4 text-slate-950 sm:px-5 lg:px-7 ${theme === "dark" ? "dark-workspace" : ""}`}>
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_16%_12%,rgba(255,255,255,0.82),transparent_26%),radial-gradient(circle_at_88%_18%,rgba(64,88,255,0.15),transparent_28%),radial-gradient(circle_at_70%_90%,rgba(20,184,166,0.12),transparent_26%)]" />
-      <div className="glass-panel relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1480px] overflow-hidden rounded-[28px] p-3 sm:p-4 lg:p-5">
+    <div
+      className={cn(
+        "workspace-shell min-h-screen overflow-x-hidden px-3 py-4 text-slate-950 sm:px-5 lg:px-7",
+        theme === "dark" ? "dark-workspace bg-[#202020]" : "bg-[#bdbdbd]"
+      )}
+    >
+      <div
+        className={cn(
+          "relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1480px] overflow-hidden rounded-[8px] shadow-[0_24px_70px_rgba(30,30,30,0.12)]",
+          theme === "dark" ? "bg-[#252525]" : "bg-[#d4d4d4]"
+        )}
+      >
         <div className="hidden shrink-0 lg:block">
           <Sidebar />
         </div>
@@ -56,13 +65,13 @@ export function AppLayout() {
           onClose={() => setIsMobileSidebarOpen(false)}
           onOpen={() => setIsMobileSidebarOpen(true)}
         />
-        <main className="min-w-0 flex-1 px-1 pt-14 sm:px-3 lg:px-5 lg:pt-0">
+        <main className="min-w-0 flex-1 px-4 py-5 pt-16 sm:px-5 lg:px-6 lg:pt-5">
           <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-500">
+              <p className="text-xs font-semibold text-slate-500">
                 Monday, July 27 2026
               </p>
-              <h1 className="mt-1 text-2xl font-black tracking-normal text-slate-950 sm:text-3xl">
+              <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950 sm:text-3xl">
                 {activeDomain.dashboard.pageTitle}
               </h1>
             </div>
@@ -92,13 +101,13 @@ export function AppLayout() {
               ) : null}
               <div
                 aria-label="Theme"
-                className="glass-control inline-flex h-11 items-center rounded-full p-1"
+                className="glass-control inline-flex h-10 items-center rounded-full p-1"
                 role="group"
               >
                 <button
                   aria-pressed={theme === "light"}
                   className={cn(
-                    "inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-black text-slate-600",
+                    "inline-flex h-8 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold text-slate-600",
                     theme === "light" && "blue-pill text-white"
                   )}
                   onClick={() => {
@@ -114,7 +123,7 @@ export function AppLayout() {
                 <button
                   aria-pressed={theme === "dark"}
                   className={cn(
-                    "inline-flex h-9 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-black text-slate-600",
+                    "inline-flex h-8 items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold text-slate-600",
                     theme === "dark" && "blue-pill text-white"
                   )}
                   onClick={() => {
@@ -130,7 +139,7 @@ export function AppLayout() {
               </div>
               <button
                 aria-label="Notifications"
-                className="glass-control relative inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-700"
+                className="glass-control relative inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700"
                 onClick={() => setIsNotificationsOpen((isOpen) => !isOpen)}
                 type="button"
               >
@@ -174,12 +183,12 @@ export function AppLayout() {
                   )}
                 </div>
               ) : null}
-              <div className="glass-control hidden min-h-11 items-center gap-3 rounded-full px-3 py-1 sm:flex">
+              <div className="glass-control hidden min-h-10 items-center gap-3 rounded-full px-2.5 py-1 sm:flex">
                 <span className="blue-pill inline-flex h-8 w-8 items-center justify-center rounded-full text-white">
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span className="leading-tight">
-                  <span className="block text-sm font-bold text-slate-950">
+                  <span className="block text-sm font-semibold text-slate-950">
                     {activeDomain.application.assistantName}
                   </span>
                   <span className="block text-xs font-medium text-slate-500">

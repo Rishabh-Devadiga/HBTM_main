@@ -10,6 +10,7 @@ from backend.domains.curator.schemas.onboarding import (
 )
 from backend.domains.curator.agents.identity_agent import generate_identity_profile
 from backend.domains.curator.agents.planner_agent import generate_growth_plan
+from backend.domains.curator.agents.decision_agent import generate_decision
 from backend.domains.curator.workflows.identity_profile_persistence_service import (
     IdentityProfilePersistenceService,
 )
@@ -30,6 +31,7 @@ class CuratorOnboardingWorkflow:
         self._validate_request(request)
         identity_profile = generate_identity_profile(request)
         growth_plan = generate_growth_plan(identity_profile)
+        decision = generate_decision(identity_profile, growth_plan)
         persisted_profile = self.persistence_service.save_identity_profile(
             onboarding=request,
             profile=identity_profile,
@@ -41,6 +43,7 @@ class CuratorOnboardingWorkflow:
             identityProfileId=persisted_profile.id,
             identityProfile=persisted_profile.profile,
             growthPlan=growth_plan,
+            decision=decision,
         )
 
     def _validate_request(self, request: CuratorOnboardingRequest) -> None:
