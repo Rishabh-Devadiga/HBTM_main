@@ -1,0 +1,154 @@
+"""Curator authentication API."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi.concurrency import run_in_threadpool
+
+from backend.api.schemas.common import SuccessResponse
+from backend.domains.curator.schemas.auth import (
+    CuratorAuthResponse,
+    CuratorAuthStatusResponse,
+    CuratorLoginRequest,
+    CuratorRegisterRequest,
+    CuratorRegisterResponse,
+)
+from backend.domains.curator.workflows.auth_service import (
+    AuthenticatedUser,
+    CuratorAuthService,
+)
+
+
+router = APIRouter(prefix="/curator/auth", tags=["curator-auth"])
+
+
+def get_curator_auth_service() -> CuratorAuthService:
+    return CuratorAuthService()
+
+
+def _bearer_token(authorization: str | None) -> str | None:
+    if not authorization:
+        return None
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token.strip():
+        return None
+    return token.strip()
+
+
+async def get_current_curator_user(
+    authorization: str | None = Header(default=None),
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> AuthenticatedUser:
+    auth_user = await run_in_threadpool(
+        service.authenticate_token,
+        _bearer_token(authorization),
+    )
+    if auth_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "message": "Login is required.",
+                "error_code": "auth_required",
+            },
+        )
+    return auth_user
+
+
+@router.post(
+    "/register",
+    response_model=SuccessResponse[CuratorRegisterResponse],
+    status_code=status.HTTP_201_CREATED,
+)
+async def register_curator_user(
+    request: CuratorRegisterRequest,
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorRegisterResponse]:
+    try:
+        user = await run_in_threadpool(
+            service.register,
+            name=request.name,
+            email=request.email,
+            password=request.password,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": str(exc), "error_code": "registration_failed"},
+        ) from exc
+    return SuccessResponse(
+        message="Registration complete. Please log in.",
+        data=CuratorRegisterResponse(
+            user=user,
+            message="Registration complete. Please log in.",
+        ),
+    )
+
+
+@router.post(
+    "/login",
+    response_model=SuccessResponse[CuratorAuthResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def login_curator_user(
+    request: CuratorLoginRequest,
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthResponse]:
+    try:
+        token, user, onboarding_completed = await run_in_threadpool(
+            service.login,
+            email=request.email,
+            password=request.password,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"message": str(exc), "error_code": "invalid_credentials"},
+        ) from exc
+    return SuccessResponse(
+        message="Login successful.",
+        data=CuratorAuthResponse(
+            token=token,
+            user=user,
+            onboardingCompleted=onboarding_completed,
+        ),
+    )
+
+
+@router.get(
+    "/me",
+    response_model=SuccessResponse[CuratorAuthStatusResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_curator_auth_status(
+    authorization: str | None = Header(default=None),
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthStatusResponse]:
+    auth_user = await run_in_threadpool(
+        service.authenticate_token,
+        _bearer_token(authorization),
+    )
+    if auth_user is None:
+        return SuccessResponse(
+            message="No active Curator session.",
+            data=CuratorAuthStatusResponse(authenticated=False),
+        )
+    return SuccessResponse(
+        message="Curator session retrieved.",
+        data=CuratorAuthStatusResponse(
+            authenticated=True,
+            user=service._to_auth_user(auth_user.user),
+            onboardingCompleted=auth_user.onboarding_completed,
+        ),
+    )
+
+
+@router.post("/logout", response_model=SuccessResponse[CuratorAuthStatusResponse])
+async def logout_curator_user(
+    authorization: str | None = Header(default=None),
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthStatusResponse]:
+    await run_in_threadpool(service.logout, _bearer_token(authorization))
+    return SuccessResponse(
+        message="Logged out.",
+        data=CuratorAuthStatusResponse(authenticated=False),
+    )

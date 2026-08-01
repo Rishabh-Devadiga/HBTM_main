@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from fastapi.concurrency import run_in_threadpool
 
 from backend.api.schemas.common import ErrorResponse, SuccessResponse
+from backend.domains.curator.api.auth import get_current_curator_user
 from backend.domains.curator.schemas.coach import (
     CuratorCoachChatResponse,
     CuratorCoachConversationResponse,
@@ -16,6 +17,9 @@ from backend.domains.curator.schemas.coach import (
     CuratorCoachSendMessageRequest,
 )
 from backend.domains.curator.workflows.coach_service import CuratorCoachService
+from backend.domains.curator.workflows.auth_service import AuthenticatedUser
+from backend.domains.curator.workflows.growth_journey_service import CuratorGrowthJourneyService
+from backend.domains.curator.workflows.identity_profile_persistence_service import IdentityProfilePersistenceService
 from backend.framework.agents.base_agent import TransientLLMError
 
 
@@ -23,10 +27,16 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/curator/growth-coach", tags=["curator"])
 
 
-def get_curator_coach_service() -> CuratorCoachService:
+def get_curator_coach_service(
+    auth_user: AuthenticatedUser = Depends(get_current_curator_user),
+) -> CuratorCoachService:
     """Return the Curator Growth Coach service dependency."""
 
-    return CuratorCoachService()
+    identity_service = IdentityProfilePersistenceService(user_id=auth_user.user.id)
+    return CuratorCoachService(
+        identity_service=identity_service,
+        journey_service=CuratorGrowthJourneyService(identity_service=identity_service),
+    )
 
 
 @router.get(

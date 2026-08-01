@@ -29,6 +29,9 @@ class PersistedIdentityProfile:
 class IdentityProfilePersistenceService:
     """Persist and retrieve Curator identity profiles."""
 
+    def __init__(self, user_id: int | None = None) -> None:
+        self.user_id = user_id
+
     def save_identity_profile(
         self,
         *,
@@ -39,7 +42,7 @@ class IdentityProfilePersistenceService:
 
         with get_db_session() as session:
             record = CuratorIdentityProfile(
-                user_id=None,
+                user_id=self.user_id,
                 display_name=onboarding.identity.name,
                 profession=onboarding.identity.profession,
                 profile_json=profile.model_dump(mode="json"),
@@ -67,6 +70,8 @@ class IdentityProfilePersistenceService:
                 CuratorIdentityProfile.created_at.desc(),
                 CuratorIdentityProfile.id.desc(),
             )
+            if self.user_id is not None:
+                statement = statement.where(CuratorIdentityProfile.user_id == self.user_id)
             record = session.scalars(statement).first()
             if record is None:
                 return None

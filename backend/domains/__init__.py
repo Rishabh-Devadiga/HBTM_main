@@ -23,6 +23,7 @@ register_domain(
         name="curator",
         package="backend.domains.curator",
         api_router_modules=(
+            "backend.domains.curator.api.auth",
             "backend.domains.curator.api.onboarding",
             "backend.domains.curator.api.coach",
             "backend.domains.curator.api.resources",

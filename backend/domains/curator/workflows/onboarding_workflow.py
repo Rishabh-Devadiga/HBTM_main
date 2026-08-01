@@ -38,7 +38,7 @@ class CuratorOnboardingWorkflow:
         )
         return CuratorOnboardingResponse(
             message="Curator onboarding completed successfully.",
-            nextRoute="/curator/onboarding/success",
+            nextRoute="/dashboard",
             submittedAt=datetime.now(UTC),
             identityProfileId=persisted_profile.id,
             identityProfile=persisted_profile.profile,
