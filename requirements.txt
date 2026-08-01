@@ -1,0 +1,16 @@
+# Core AI and agent framework dependencies.
+crewai
+crewai-tools
+google-genai
+
+# Backend runtime dependencies.
+fastapi
+uvicorn
+
+# Configuration, validation, database, and cache foundations.
+python-dotenv
+pydantic
+sqlalchemy
+psycopg2-binary
+redis
+requests

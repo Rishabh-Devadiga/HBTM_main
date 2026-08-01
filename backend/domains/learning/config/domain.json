@@ -1,0 +1,15 @@
+{
+  "domain_name": "learning",
+  "assistant_display_name": "Saarthi AI",
+  "default_user_name": "Default Learner",
+  "default_learning_plan_title_template": "{subject} Learning Plan",
+  "roadmap_title_suffix": "Learning Roadmap",
+  "default_learning_goal_label": "Complete the learning goal",
+  "default_subject_label": "Selected subject",
+  "default_skill_level_label": "Current skill level not provided",
+  "default_available_time_label": "Available time not provided",
+  "default_target_deadline_label": "Target deadline not provided",
+  "mentor_not_provided_label": "Not provided",
+  "mentor_no_previous_conversation_label": "No previous conversation",
+  "initial_recent_activity": "Learning session started from a new user request."
+}
