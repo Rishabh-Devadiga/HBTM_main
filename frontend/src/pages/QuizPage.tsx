@@ -327,7 +327,7 @@ function CuratorResourcesPage() {
           <div className="max-w-3xl">
             <div className="glass-control mb-4 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black text-slate-600">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
-              Personalized by Curator Agent
+              Personalized by saarthi.ai
             </div>
             <h1 className="text-2xl font-semibold text-slate-950 sm:text-3xl">
               Curated Resources
@@ -561,7 +561,7 @@ function ResourcePreferencesModal({
               Content Preferences
             </h2>
             <p className="mt-1 text-sm font-medium leading-6 text-slate-600">
-              Curator will use these preferences the next time it generates
+              saarthi.ai will use these preferences the next time it generates
               recommendations.
             </p>
           </div>

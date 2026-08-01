@@ -14,15 +14,15 @@ import type { DomainConfig } from "@/domain/types";
 export const curatorDomain: DomainConfig = {
   id: "curator",
   application: {
-    name: "Curator",
-    assistantName: "Curator AI",
-    assistantShortName: "Curator",
-    defaultUserName: "Curator Member",
-    documentTitle: "Curator",
+    name: "saarthi.ai",
+    assistantName: "saarthi.ai",
+    assistantShortName: "saarthi",
+    defaultUserName: "saarthi.ai Member",
+    documentTitle: "saarthi.ai",
     workspaceName: "Growth Workspace",
   },
   navigation: {
-    ariaLabel: "Curator workspace navigation",
+    ariaLabel: "saarthi.ai workspace navigation",
     items: [
       { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
       { label: "Growth Journey", path: "/learning-plan", icon: Map },
@@ -53,7 +53,7 @@ export const curatorDomain: DomainConfig = {
     notificationSubtitle: "Growth prompts",
     emptyTitle: "No active growth journey yet",
     emptyDescription:
-      "Start a Curator session from chat, then return here to see your journey, habits, reflections, and recommendations in one place.",
+      "Start a saarthi.ai session from chat, then return here to see your journey, habits, reflections, and recommendations in one place.",
     topicsCompleted: "Actions Completed",
     quizAverage: "Resource Fit",
     interviews: "Profile Reviews",
@@ -72,7 +72,7 @@ export const curatorDomain: DomainConfig = {
     plan: {
       emptyTitle: "No growth journey yet",
       emptyDescription:
-        "Start a Curator session in chat to generate a personalized journey. Once the workflow returns a path, it will appear here automatically.",
+        "Start a saarthi.ai session in chat to generate a personalized journey. Once the workflow returns a path, it will appear here automatically.",
       createAction: "Create Growth Journey",
       continueAction: "Continue to Habits",
       finalMilestone: "Final Milestone",
@@ -85,8 +85,8 @@ export const curatorDomain: DomainConfig = {
       title: "Habit tracking overview",
       emptyTitle: "No habits tracked yet",
       emptyDescription:
-        "Start a Curator session in chat. Once the workflow produces a progress summary, your consistency metrics and next action will appear here.",
-      emptyAction: "Start Curator Session",
+        "Start a saarthi.ai session in chat. Once the workflow produces a progress summary, your consistency metrics and next action will appear here.",
+      emptyAction: "Start saarthi.ai Session",
       summary: "Habit Summary",
       journey: "Growth Journey",
       timeline: "Habit Timeline",
@@ -97,11 +97,11 @@ export const curatorDomain: DomainConfig = {
       eyebrow: "Curated Resources",
       emptyTitle: "Create a growth journey first",
       emptyDescription:
-        "Curator uses your current journey to organize focused resources. Complete onboarding to generate a journey.",
+        "saarthi.ai uses your current journey to organize focused resources. Complete onboarding to generate a journey.",
       emptyAction: "Create Growth Journey",
       loadingTitle: "Preparing resources",
       loadingDescription:
-        "Curator is turning your journey into a focused resource set.",
+        "saarthi.ai is turning your journey into a focused resource set.",
       generateAction: "Refresh Resources",
       requestFailed: "Resource request failed",
       noTopics: "The current journey does not contain any resource topics.",
@@ -113,8 +113,8 @@ export const curatorDomain: DomainConfig = {
     mentor: {
       description: "Ask questions about your growth journey.",
       unavailableTitle: "Unable to contact Growth Coach.",
-      thinkingLabel: "Curator AI is thinking...",
-      welcomeTitle: "Meet Curator AI",
+      thinkingLabel: "saarthi.ai is thinking...",
+      welcomeTitle: "Meet saarthi.ai",
       welcomeDescription:
         "Ask about your journey, habits, resources, reflections, or next step.",
       inputLabel: "Message Growth Coach",
@@ -129,25 +129,25 @@ export const curatorDomain: DomainConfig = {
     interview: {
       emptyTitle: "No growth journey yet",
       emptyDescription:
-        "Create a growth journey first so Curator can prepare a profile review around your goal.",
+        "Create a growth journey first so saarthi.ai can prepare a profile review around your goal.",
       emptyAction: "Create Growth Journey",
       setupEyebrow: "Profile Workspace",
       setupDescription:
         "Configure a focused review based on your current growth goal.",
       goalLabel: "Growth Goal",
-      interviewerSubtitle: "Curator profile coach",
+      interviewerSubtitle: "saarthi.ai profile coach",
       welcomeSpeech: "Welcome to your profile review. Let's begin.",
     },
     feedback: {
       coachLabel: "Growth Coach",
       emptyTitle: "No reflections yet",
       emptyDescription:
-        "Start a Curator session first, and your reflections and prompts will appear here.",
+        "Start a saarthi.ai session first, and your reflections and prompts will appear here.",
     },
     chat: {
       title: "Build your personalized growth journey",
       description:
-        "Tell Curator what you want to improve, your timeline, and your current context. It will shape a structured journey with next steps, reflections, and prompts.",
+        "Tell saarthi.ai what you want to improve, your timeline, and your current context. It will shape a structured journey with next steps, reflections, and prompts.",
       emptyGoalError: "Enter a growth goal before creating a journey.",
       minimumGoalError: (minimumLength) =>
         `Your growth goal must be at least ${minimumLength} characters.`,
@@ -158,8 +158,8 @@ export const curatorDomain: DomainConfig = {
         "Include your goal, current context, timeline, and available time.",
       generatingLabel: "Creating your growth journey...",
       loadingDescription:
-        "Curator is reading your goal and shaping a practical path.",
-      workflowCompleted: "Curator workflow completed",
+        "saarthi.ai is reading your goal and shaping a practical path.",
+      workflowCompleted: "saarthi.ai workflow completed",
       intentTitle: "Growth Intent",
       goalLabel: "Growth Goal",
       availableTimeLabel: "Available Time",
@@ -168,7 +168,7 @@ export const curatorDomain: DomainConfig = {
     onboarding: {
       profileTitle: "Build your growth profile",
       createAction: "Create Growth Journey",
-      loadingTitle: "Curator is building your path",
+      loadingTitle: "saarthi.ai is building your path",
       loadingDescription:
         "Your answers are being transformed into a personalized growth workflow.",
       loadingStages: [
@@ -179,26 +179,26 @@ export const curatorDomain: DomainConfig = {
         "Almost ready...",
       ],
       goalDescription:
-        "Choose a popular path or describe the outcome you want Curator to help you reach.",
+        "Choose a popular path or describe the outcome you want saarthi.ai to help you reach.",
       quickGoalsLabel: "Quick growth goals",
       customGoalLabel: "Custom growth goal",
       skillDescription:
-        "Your starting point helps Curator choose the right depth, pacing, and sequence.",
+        "Your starting point helps saarthi.ai choose the right depth, pacing, and sequence.",
       studyTimeDescription:
-        "Choose a sustainable daily commitment. Curator will shape the journey around the time you can consistently protect.",
+        "Choose a sustainable daily commitment. saarthi.ai will shape the journey around the time you can consistently protect.",
       targetDateDescription:
         "Set the date you want to reach your goal. You can adjust your pace later as your journey evolves.",
       targetDateHint:
-        "Curator will use this deadline and your daily commitment to personalize the number, pacing, and duration of journey phases.",
+        "saarthi.ai will use this deadline and your daily commitment to personalize the number, pacing, and duration of journey phases.",
       preferencesDescription:
-        "Select every format that helps you stay engaged. Curator will include these preferences in your profile.",
+        "Select every format that helps you stay engaged. saarthi.ai will include these preferences in your profile.",
       preferencesLabel: "Growth preferences",
       goalError: "Choose a growth goal or enter a custom goal.",
       preferencesError: "Select at least one growth preference.",
     },
   },
   calendar: {
-    eventTitle: "Curator Focus Session",
+    eventTitle: "saarthi.ai Focus Session",
     goalLabel: "Growth Goal",
     missingPlanError: "Create a growth journey before scheduling sessions.",
   },
@@ -207,7 +207,7 @@ export const curatorDomain: DomainConfig = {
     heroTitle: "Grow intentionally with",
     heroDescription:
       "An AI-powered companion that organizes personal growth journeys, recommends focused resources, supports habits, and prompts useful reflection.",
-    previewAriaLabel: "Curator growth dashboard preview",
+    previewAriaLabel: "saarthi.ai growth dashboard preview",
     previewHost: "growth.curator.ai",
     previewRoadmap: "Growth Journey",
     previewMilestone: "Your next step is ready",
@@ -221,22 +221,22 @@ export const curatorDomain: DomainConfig = {
     featureEyebrow: "One workspace, steady support",
     featureHeading: "Everything you need to keep growth moving",
     featureDescription:
-      "Curator connects journey planning, habit support, reflection, and resources into one clear experience.",
+      "saarthi.ai connects journey planning, habit support, reflection, and resources into one clear experience.",
     howEyebrow: "How it works",
     howHeading: "From intention to a clear next step",
     howDescription:
       "A simple workflow turns an open-ended goal into a system you can actually follow.",
-    benefitEyebrow: "Why Curator?",
+    benefitEyebrow: "Why saarthi.ai?",
     benefitHeading: "Support built around your momentum",
     benefitDescription:
-      "More than a one-time plan, Curator gives you a connected loop of direction, reflection, and focused action.",
+      "More than a one-time plan, saarthi.ai gives you a connected loop of direction, reflection, and focused action.",
     faqDescription:
-      "Curator keeps the path into your growth workflow simple and intentional.",
+      "saarthi.ai keeps the path into your growth workflow simple and intentional.",
     ctaHeading: "Start Your Growth Journey Today",
     ctaDescription:
       "Turn your goal into a practical journey, then keep moving with habits, resources, and reflective next steps.",
     ctaAction: "Create My Growth Journey",
-    footerCopyright: "Copyright 2026 Curator. All rights reserved.",
+    footerCopyright: "Copyright 2026 saarthi.ai. All rights reserved.",
     featurePlannerTitle: "Growth Journey",
     featurePlannerDescription:
       "Creates a personalized, milestone-based journey based on your goal, starting point, schedule, and target date.",
@@ -261,7 +261,7 @@ export const curatorDomain: DomainConfig = {
     featureCalendarTitle: "Scheduled Focus",
     featureCalendarDescription:
       "Sync focus sessions with your calendar to protect time and stay accountable.",
-    howStep1Title: "Tell Curator your goal",
+    howStep1Title: "Tell saarthi.ai your goal",
     howStep1Description:
       "Share what you want to improve, your current context, available time, and target date.",
     howStep2Title: "Receive a personalized journey",
@@ -282,12 +282,12 @@ export const curatorDomain: DomainConfig = {
     benefit3Title: "Continuous Growth",
     benefit3Description:
       "Every stage connects to the next, so your journey stays practical and measurable.",
-    faq1Question: "What information does Curator need?",
+    faq1Question: "What information does saarthi.ai need?",
     faq1Answer:
       "A clear growth goal, your current context, available time, and target date are enough to create a complete journey.",
     faq2Question: "Does the landing page create a session?",
     faq2Answer:
-      "No. It only introduces Curator and takes you to Chat. A session starts only after you submit your request there.",
+      "No. It only introduces saarthi.ai and takes you to Chat. A session starts only after you submit your request there.",
     faq3Question: "Can I return to my journey after refreshing?",
     faq3Answer:
       "Yes. Your current session is stored in the browser so the dashboard, journey, habits, and reflections remain available.",

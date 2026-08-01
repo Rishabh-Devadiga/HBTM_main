@@ -1,8 +1,9 @@
-import { Menu, Sparkles, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
+import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { buttonVariants } from "@/components/common/buttonVariants";
 import { cn } from "@/utils/cn";
 import { activeDomain } from "@/domain";
@@ -24,8 +25,8 @@ export function Navbar() {
           className="inline-flex items-center gap-2.5 font-semibold"
           to="/"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-500 text-white shadow-[0_8px_24px_rgba(59,130,246,0.35)]">
-            <Sparkles className="h-5 w-5" aria-hidden="true" />
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-950 text-white shadow-[0_8px_24px_rgba(15,23,42,0.25)]">
+            <SaarthiLogo className="h-6 w-7" />
           </span>
           <span className="text-lg">{activeDomain.application.name}</span>
         </Link>

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Bell, Moon, Search, Sparkles, Sun, X } from "lucide-react";
+import { Bell, Moon, Search, Sun, X } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
+import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useSession } from "@/context/SessionContext";
@@ -185,7 +186,7 @@ export function AppLayout() {
               ) : null}
               <div className="glass-control hidden min-h-10 items-center gap-3 rounded-full px-2.5 py-1 sm:flex">
                 <span className="blue-pill inline-flex h-8 w-8 items-center justify-center rounded-full text-white">
-                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  <SaarthiLogo className="h-5 w-6" />
                 </span>
                 <span className="leading-tight">
                   <span className="block text-sm font-semibold text-slate-950">

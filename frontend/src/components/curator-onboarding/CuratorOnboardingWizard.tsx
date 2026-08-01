@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
+import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import {
   curatorSteps,
 } from "@/components/curator-onboarding/options";
@@ -116,7 +117,7 @@ export function CuratorOnboardingWizard() {
       return;
     }
 
-    console.log("Curator onboarding data", data);
+    console.log("saarthi.ai onboarding data", data);
     setError(null);
     submitOnboarding.mutate(toOnboardingRequest(data), {
       onSuccess: (response) => {
@@ -138,7 +139,7 @@ export function CuratorOnboardingWizard() {
             to="/"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-slate-950 text-white shadow-[0_10px_24px_rgba(24,24,24,0.14)]">
-              <Sparkles className="h-5 w-5" aria-hidden="true" />
+              <SaarthiLogo className="h-6 w-7" />
             </span>
             <span className="text-lg font-semibold text-slate-950">{activeDomain.application.name}</span>
           </Link>
@@ -158,7 +159,7 @@ export function CuratorOnboardingWizard() {
             Onboarding
           </p>
           <h1 className="mt-3 text-2xl font-semibold tracking-normal text-slate-950">
-            Shape your Curator experience
+            Shape your saarthi.ai experience
           </h1>
           <p className="mt-3 text-sm font-medium leading-6 text-slate-500">
             A short setup to tune your journey, resources, habits, and coaching style.

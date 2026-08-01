@@ -25,10 +25,10 @@ export function CuratorOnboardingSuccessPage() {
           Setup captured
         </p>
         <h1 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
-          Curator is preparing your workspace
+          saarthi.ai is preparing your workspace
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-sm font-medium leading-6 text-slate-500 sm:text-base">
-          Your onboarding answers are available as one local object. This temporary screen is ready for the next phase of the Curator flow.
+          Your onboarding answers are available as one local object. This temporary screen is ready for the next phase of the saarthi.ai flow.
         </p>
 
         <div className="mt-7 rounded-[8px] border border-[#e2e2e2] bg-[#f2f2f2] p-4 text-left">
