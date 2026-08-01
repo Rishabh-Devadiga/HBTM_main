@@ -90,7 +90,6 @@ function ProductPreview() {
           <PreviewNavItem icon={BarChart3} label="Overview" selected />
           <PreviewNavItem icon={BookOpenCheck} label={activeDomain.features.plan} />
           <PreviewNavItem icon={Target} label={activeDomain.features.progress} />
-          <PreviewNavItem icon={MessageSquareText} label={activeDomain.features.feedback} />
         </aside>
 
         <div className="bg-[#0d1220]/75 p-4 sm:p-5">

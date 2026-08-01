@@ -85,7 +85,7 @@ export function LoginPage() {
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <main className="workspace-shell flex min-h-screen items-center justify-center bg-[#bdbdbd] px-4 py-8">
+    <main className="workspace-shell flex min-h-screen items-center justify-center bg-[#e8eff9] px-4 py-8">
       {children}
     </main>
   );

@@ -133,7 +133,7 @@ export function CuratorOnboardingWizard() {
   }
 
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-[#bdbdbd] text-slate-950">
+    <div className="relative isolate min-h-screen overflow-hidden bg-[#e8eff9] text-slate-950">
       <header className="border-b border-[#d7d7d7] bg-white">
         <div className="mx-auto flex h-18 w-[min(100%-2rem,1160px)] items-center justify-between">
           <Link

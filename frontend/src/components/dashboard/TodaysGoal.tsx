@@ -54,7 +54,7 @@ export function TodaysGoal({
       </div>
 
       <Link
-        className="blue-pill mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-4 text-sm font-black text-white"
+        className="blue-pill sticky bottom-5 mt-6 inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-4 text-sm font-black text-white"
         to="/learning-plan"
       >
         {activeDomain.dashboard.continueAction}

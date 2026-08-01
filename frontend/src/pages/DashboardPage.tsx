@@ -86,11 +86,16 @@ export function DashboardPage() {
 
         <QuickStats
           completedTopics={completedTopics}
+          progressPercentage={progressPercentage}
           totalTopics={topics.length}
         />
 
         <div className="grid gap-5 lg:grid-cols-2">
-          <InterviewAnalytics />
+          <InterviewAnalytics
+            learningGoal={learningGoal}
+            progressPercentage={progressPercentage}
+            task={todaysTask}
+          />
           <WeeklyActivity />
         </div>
 
@@ -107,7 +112,7 @@ export function DashboardPage() {
         />
       </div>
 
-      <aside className="space-y-5">
+      <aside className="space-y-5 xl:sticky xl:top-5 xl:self-start">
         <TodaysGoal
           estimatedMinutes={estimatedMinutes}
           progress={progressPercentage}

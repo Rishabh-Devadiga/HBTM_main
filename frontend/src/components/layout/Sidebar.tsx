@@ -11,10 +11,10 @@ type SidebarProps = {
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   return (
-    <aside className="flex h-full w-[220px] shrink-0 flex-col bg-white p-4 text-slate-950">
+    <aside className="flex h-auto min-h-full w-[220px] shrink-0 flex-col rounded-[28px] bg-white p-4 text-slate-950">
       <div className="pb-6 pt-1">
         <Link
-          className="group flex items-center gap-3 rounded-[8px] px-1 py-2 transition hover:bg-slate-100"
+          className="group flex items-center gap-3 rounded-full px-1 py-2 transition hover:bg-slate-950 hover:text-white"
           onClick={onNavigate}
           to="/"
         >
@@ -22,10 +22,10 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             <SaarthiLogo className="h-6 w-7" />
           </span>
           <span>
-            <span className="block text-lg font-semibold tracking-tight text-slate-950">
+            <span className="block text-lg font-semibold tracking-tight text-slate-950 transition group-hover:text-white">
               {activeDomain.application.name}
             </span>
-            <span className="block text-xs font-medium text-slate-500">
+            <span className="block text-xs font-medium text-slate-500 transition group-hover:text-white/75">
               {activeDomain.application.workspaceName}
             </span>
           </span>
@@ -36,7 +36,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         Menu
       </p>
       <nav
-        className="space-y-1"
+        className="space-y-2"
         aria-label={activeDomain.navigation.ariaLabel}
       >
         {activeDomain.navigation.items.map((item) => (
