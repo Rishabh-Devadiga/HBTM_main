@@ -181,3 +181,54 @@ export type CuratorCoachConversationApiResponse =
 
 export type CuratorCoachChatApiResponse =
   ApiSuccessResponse<CuratorCoachChatResponse>;
+
+export type CuratorResourceType =
+  | "Book"
+  | "Video"
+  | "Podcast"
+  | "Article"
+  | "Community";
+
+export type CuratedResource = {
+  id: string;
+  title: string;
+  creator: string;
+  description: string;
+  tags: string[];
+  estimatedDuration: string;
+  type: CuratorResourceType;
+  url: string;
+  reason: string;
+  isBookmarked: boolean;
+  viewedCount: number;
+};
+
+export type CuratorResourcePreferences = {
+  preferredTypes: CuratorResourceType[];
+  preferredTags: string[];
+};
+
+export type CuratorResourcesResponse = {
+  identityProfileId: number;
+  recommendationId: number;
+  generatedAt: string;
+  recommendationSummary: string;
+  selectionReasons: string[];
+  resources: CuratedResource[];
+  preferences: CuratorResourcePreferences;
+};
+
+export type CuratorResourceEngagementResponse = {
+  resourceId: string;
+  isBookmarked: boolean;
+  viewedCount: number;
+};
+
+export type CuratorResourcesApiResponse =
+  ApiSuccessResponse<CuratorResourcesResponse>;
+
+export type CuratorResourceEngagementApiResponse =
+  ApiSuccessResponse<CuratorResourceEngagementResponse>;
+
+export type CuratorResourcePreferencesApiResponse =
+  ApiSuccessResponse<CuratorResourcePreferences>;

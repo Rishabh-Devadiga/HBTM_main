@@ -6,6 +6,11 @@ import type {
   CuratorGrowthJourneyApiResponse,
   CuratorOnboardingApiResponse,
   CuratorOnboardingRequest,
+  CuratedResource,
+  CuratorResourceEngagementApiResponse,
+  CuratorResourcePreferences,
+  CuratorResourcePreferencesApiResponse,
+  CuratorResourcesApiResponse,
 } from "@/types/curator";
 
 export async function submitCuratorOnboarding(
@@ -76,6 +81,50 @@ export async function sendCuratorCoachMessage({
   const response = await apiClient.post<CuratorCoachChatApiResponse>(
     `/curator/growth-coach/conversations/${conversationId}/messages`,
     { message }
+  );
+  return response.data;
+}
+
+export async function getCuratorResources(
+  refresh = false
+): Promise<CuratorResourcesApiResponse> {
+  const response = await apiClient.get<CuratorResourcesApiResponse>(
+    "/curator/resources",
+    { params: { refresh } }
+  );
+  return response.data;
+}
+
+export async function bookmarkCuratorResource({
+  resource,
+  bookmarked,
+}: {
+  resource: CuratedResource;
+  bookmarked: boolean;
+}): Promise<CuratorResourceEngagementApiResponse> {
+  const response = await apiClient.post<CuratorResourceEngagementApiResponse>(
+    "/curator/resources/bookmark",
+    { resource, bookmarked }
+  );
+  return response.data;
+}
+
+export async function openCuratorResource(
+  resource: CuratedResource
+): Promise<CuratorResourceEngagementApiResponse> {
+  const response = await apiClient.post<CuratorResourceEngagementApiResponse>(
+    "/curator/resources/open",
+    { resource }
+  );
+  return response.data;
+}
+
+export async function updateCuratorResourcePreferences(
+  preferences: CuratorResourcePreferences
+): Promise<CuratorResourcePreferencesApiResponse> {
+  const response = await apiClient.put<CuratorResourcePreferencesApiResponse>(
+    "/curator/resources/preferences",
+    preferences
   );
   return response.data;
 }

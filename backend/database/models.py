@@ -5,7 +5,17 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, JSON, String, Text, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    JSON,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.database.database import Base
@@ -275,5 +285,106 @@ class CuratorCoachMessage(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorResourceRecommendation(Base):
+    """Persisted Curator Agent resource recommendation history."""
+
+    __tablename__ = "curator_resource_recommendations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    recommendation_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    context_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorResourceBookmark(Base):
+    """Persisted bookmark state for one Curator resource."""
+
+    __tablename__ = "curator_resource_bookmarks"
+    __table_args__ = (
+        UniqueConstraint(
+            "identity_profile_id",
+            "resource_id",
+            name="uq_curator_resource_bookmark_identity_resource",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    resource_id: Mapped[str] = mapped_column(String(160), index=True, nullable=False)
+    resource_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    bookmarked: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorResourceView(Base):
+    """Persisted resource open/view event."""
+
+    __tablename__ = "curator_resource_views"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    resource_id: Mapped[str] = mapped_column(String(160), index=True, nullable=False)
+    resource_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    opened_url: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
+class CuratorResourcePreference(Base):
+    """Persisted resource preference overrides."""
+
+    __tablename__ = "curator_resource_preferences"
+    __table_args__ = (
+        UniqueConstraint(
+            "identity_profile_id",
+            name="uq_curator_resource_preferences_identity",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    identity_profile_id: Mapped[int] = mapped_column(
+        ForeignKey("curator_identity_profiles.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    preferences_json: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
         nullable=False,
     )

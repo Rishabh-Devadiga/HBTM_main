@@ -18,6 +18,7 @@ from backend.domains.curator.schemas.growth_journey import (
 )
 from backend.domains.curator.schemas.identity import IdentityProfile
 from backend.domains.curator.schemas.planner import GrowthPlan
+from backend.domains.curator.schemas.resources import CuratedResourceAgentOutput
 from backend.framework.agents.base_agent import create_base_agent, run_structured_agent
 from backend.framework.base.config import get_settings
 
@@ -31,6 +32,7 @@ CURATOR_COACH_SUGGESTIONS_PROMPT = load_prompt_block(
     "curator.md",
     "coach_suggestions_prompt",
 )
+CURATOR_RESOURCES_PROMPT = load_prompt_block("curator.md", "resources_prompt")
 
 
 def create_curator_agent() -> Agent:
@@ -157,6 +159,50 @@ def generate_growth_coach_suggestions(
         prompt=prompt,
         response_model=CuratorCoachAgentResponse,
         missing_output_error="Curator Agent did not return structured coach suggestions.",
+    )
+
+
+def generate_curated_resources(
+    *,
+    identity_profile: IdentityProfile,
+    growth_plan: GrowthPlan,
+    decision: Decision,
+    growth_journey: CuratorJourneyAgentOutput,
+    onboarding_json: dict[str, Any],
+    habits_json: dict[str, Any],
+    reflections_json: list[dict[str, Any]],
+    progress_json: dict[str, Any],
+    completed_activities_json: list[dict[str, Any]],
+    preferences_json: dict[str, Any],
+    previous_interactions_json: list[dict[str, Any]],
+    bookmarks_json: list[dict[str, Any]],
+    views_json: list[dict[str, Any]],
+    agent: Agent | None = None,
+) -> CuratedResourceAgentOutput:
+    """Generate personalized resource recommendations with the Curator Agent."""
+
+    curator_agent = agent or create_curator_agent()
+    prompt = CURATOR_RESOURCES_PROMPT.format(
+        identity_profile_json=identity_profile.model_dump_json(indent=2),
+        growth_plan_json=growth_plan.model_dump_json(indent=2),
+        decision_json=decision.model_dump_json(indent=2),
+        growth_journey_json=growth_journey.model_dump_json(indent=2),
+        onboarding_json=onboarding_json,
+        habits_json=habits_json,
+        reflections_json=reflections_json,
+        progress_json=progress_json,
+        completed_activities_json=completed_activities_json,
+        preferences_json=preferences_json,
+        previous_interactions_json=previous_interactions_json,
+        bookmarks_json=bookmarks_json,
+        views_json=views_json,
+    )
+    return run_structured_agent(
+        operation="Curator Resource Recommendations",
+        agent=curator_agent,
+        prompt=prompt,
+        response_model=CuratedResourceAgentOutput,
+        missing_output_error="Curator Agent did not return structured resources.",
     )
 
 

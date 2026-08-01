@@ -25,6 +25,7 @@ register_domain(
         api_router_modules=(
             "backend.domains.curator.api.onboarding",
             "backend.domains.curator.api.coach",
+            "backend.domains.curator.api.resources",
         ),
     ),
 )

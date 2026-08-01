@@ -112,3 +112,57 @@ Onboarding Preferences:
 Current Progress:
 {progress_json}
 [/coach_suggestions_prompt]
+
+[resources_prompt]
+Generate personalized Curated Resources page data.
+
+Rules:
+- Return only the requested structured CuratedResourceAgentOutput.
+- Recommendations must be personalized from the provided Identity Profile, Growth Plan, Decision, Growth Journey phase, completed activities, habits, reflections, interests, available weekly hours, previous interactions, previous views, bookmarks, and content preferences.
+- Recommend concrete, real public resources with usable URLs. Do not return placeholder URLs, invented domains, or generic homepages when a specific resource URL is known.
+- Include a balanced mix across Book, Video, Podcast, Article, and Community unless user preferences clearly narrow the set.
+- Keep resources safe for personal growth. Avoid medical, psychological, legal, or financial advice. For goals involving smoking, anger, health, or addiction, prefer habit-building, reflection, credible public-health support, and professional-help-adjacent resources without making clinical claims.
+- Each resource must explain why it fits the user's current phase and available weekly hours.
+- Do not duplicate previously viewed resources unless the resource is still highly relevant.
+- Use stable lowercase ids derived from the resource title and creator.
+- Keep recommendationSummary concise and specific.
+
+Identity Profile:
+{identity_profile_json}
+
+Growth Plan:
+{growth_plan_json}
+
+Decision:
+{decision_json}
+
+Growth Journey:
+{growth_journey_json}
+
+Onboarding Preferences:
+{onboarding_json}
+
+Habits:
+{habits_json}
+
+Reflections:
+{reflections_json}
+
+Current Progress:
+{progress_json}
+
+Completed Activities:
+{completed_activities_json}
+
+Resource Preferences:
+{preferences_json}
+
+Previous Interactions:
+{previous_interactions_json}
+
+Bookmarked Resources:
+{bookmarks_json}
+
+Viewed Resources:
+{views_json}
+[/resources_prompt]

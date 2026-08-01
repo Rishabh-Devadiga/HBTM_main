@@ -2,9 +2,21 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
+  Bookmark,
+  BookOpen,
   ClipboardCheck,
+  Clock3,
+  ExternalLink,
+  Filter,
+  Loader2,
+  Podcast,
+  RefreshCcw,
   Send,
+  Settings2,
   Sparkles,
+  UsersRound,
+  Video,
+  X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -15,13 +27,34 @@ import { QuizQuestionCard } from "@/components/quiz/QuizQuestionCard";
 import { QuizResults } from "@/components/quiz/QuizResults";
 import { useSession } from "@/context/SessionContext";
 import { activeDomain } from "@/domain";
+import {
+  useBookmarkCuratorResource,
+  useCuratorResources,
+  useOpenCuratorResource,
+  useRefreshCuratorResources,
+  useUpdateCuratorResourcePreferences,
+} from "@/hooks/useCuratorApi";
 import { useGenerateQuiz, useSubmitQuiz } from "@/hooks/useQuizApi";
+import type {
+  CuratedResource,
+  CuratorResourcePreferences,
+  CuratorResourceType,
+} from "@/types/curator";
 import type { GeneratedQuiz, QuizSubmissionResult } from "@/types/quiz";
+import { cn } from "@/utils/cn";
 
 const DEFAULT_DIFFICULTY = "Intermediate";
 const DEFAULT_QUESTION_COUNT = 5;
 
 export function QuizPage() {
+  if (activeDomain.id === "curator") {
+    return <CuratorResourcesPage />;
+  }
+
+  return <LearningQuizPage />;
+}
+
+function LearningQuizPage() {
   const { state } = useSession();
   const plan = state.learningPlan;
   const generateMutation = useGenerateQuiz();
@@ -205,6 +238,427 @@ export function QuizPage() {
     </div>
   );
 }
+
+const RESOURCE_CATEGORIES: Array<"All" | CuratorResourceType> = [
+  "All",
+  "Book",
+  "Video",
+  "Podcast",
+  "Article",
+  "Community",
+];
+
+const RESOURCE_ICON_MAP = {
+  Article: ClipboardCheck,
+  Book: BookOpen,
+  Community: UsersRound,
+  Podcast,
+  Video,
+} satisfies Record<CuratorResourceType, typeof ClipboardCheck>;
+
+function CuratorResourcesPage() {
+  const resourcesQuery = useCuratorResources();
+  const refreshResources = useRefreshCuratorResources();
+  const bookmarkResource = useBookmarkCuratorResource();
+  const openResource = useOpenCuratorResource();
+  const updatePreferences = useUpdateCuratorResourcePreferences();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] =
+    useState<(typeof RESOURCE_CATEGORIES)[number]>("All");
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const resourcesData = resourcesQuery.data?.data ?? null;
+  const filteredResources = useMemo(
+    () => filterResources(resourcesData?.resources ?? [], search, category),
+    [category, resourcesData?.resources, search]
+  );
+
+  if (resourcesQuery.isLoading) {
+    return (
+      <div className="space-y-5">
+        <div className="glass-panel h-48 animate-pulse rounded-[8px]" />
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="metric-card h-72 animate-pulse" />
+          <div className="metric-card h-72 animate-pulse" />
+          <div className="metric-card h-72 animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  if (resourcesQuery.isError) {
+    return (
+      <section className="glass-panel rounded-[8px] p-6">
+        <p className="text-base font-black text-slate-950">
+          Unable to load curated resources
+        </p>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
+          {resourcesQuery.error.message}
+        </p>
+      </section>
+    );
+  }
+
+  if (!resourcesData) {
+    return <EmptyQuiz />;
+  }
+
+  function handleBookmark(resource: CuratedResource) {
+    bookmarkResource.mutate({
+      resource,
+      bookmarked: !resource.isBookmarked,
+    });
+  }
+
+  function handleOpen(resource: CuratedResource) {
+    openResource.mutate(resource);
+    window.open(resource.url, "_blank", "noopener,noreferrer");
+  }
+
+  async function handleSavePreferences(preferences: CuratorResourcePreferences) {
+    await updatePreferences.mutateAsync(preferences);
+    setIsPreferencesOpen(false);
+    await refreshResources.mutateAsync();
+  }
+
+  return (
+    <div className="space-y-5">
+      <section className="glass-panel rounded-[8px] p-5 sm:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-3xl">
+            <div className="glass-control mb-4 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-black text-slate-600">
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+              Personalized by Curator Agent
+            </div>
+            <h1 className="text-2xl font-semibold text-slate-950 sm:text-3xl">
+              Curated Resources
+            </h1>
+            <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+              {resourcesData.recommendationSummary}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {resourcesData.selectionReasons.map((reason) => (
+                <span
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600"
+                  key={reason}
+                >
+                  {reason}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Button
+              disabled={refreshResources.isPending}
+              onClick={() => refreshResources.mutate()}
+              variant="secondary"
+            >
+              {refreshResources.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+              )}
+              Refresh
+            </Button>
+            <Button onClick={() => setIsPreferencesOpen(true)} variant="secondary">
+              <Settings2 className="h-4 w-4" aria-hidden="true" />
+              Preferences
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="metric-card p-4">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <label className="glass-control flex min-h-12 items-center gap-2 rounded-full px-4">
+            <Filter className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+            <input
+              aria-label="Search resources"
+              className="workspace-search-input min-w-0 flex-1 text-sm font-semibold outline-none"
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by title, creator, tag, or description"
+              type="text"
+              value={search}
+            />
+            {search ? (
+              <button
+                aria-label="Clear resource search"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+                onClick={() => setSearch("")}
+                type="button"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            ) : null}
+          </label>
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:justify-end">
+            {RESOURCE_CATEGORIES.map((item) => (
+              <button
+                className={cn(
+                  "inline-flex min-h-10 shrink-0 items-center justify-center rounded-full px-4 text-sm font-black transition",
+                  category === item
+                    ? "blue-pill"
+                    : "glass-control text-slate-600 hover:text-slate-950"
+                )}
+                key={item}
+                onClick={() => setCategory(item)}
+                type="button"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {filteredResources.length === 0 ? (
+        <section className="metric-card p-8 text-center">
+          <p className="text-base font-black text-slate-950">No resources found</p>
+          <p className="mt-2 text-sm font-medium text-slate-600">
+            Try a broader search or switch the category filter.
+          </p>
+        </section>
+      ) : (
+        <section className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
+          {filteredResources.map((resource) => (
+            <ResourceCard
+              isBookmarking={bookmarkResource.isPending}
+              key={resource.id}
+              onBookmark={handleBookmark}
+              onOpen={handleOpen}
+              resource={resource}
+            />
+          ))}
+        </section>
+      )}
+
+      {isPreferencesOpen ? (
+        <ResourcePreferencesModal
+          isSaving={updatePreferences.isPending || refreshResources.isPending}
+          onClose={() => setIsPreferencesOpen(false)}
+          onSave={(preferences) => void handleSavePreferences(preferences)}
+          preferences={resourcesData.preferences}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function ResourceCard({
+  isBookmarking,
+  onBookmark,
+  onOpen,
+  resource,
+}: {
+  isBookmarking: boolean;
+  onBookmark: (resource: CuratedResource) => void;
+  onOpen: (resource: CuratedResource) => void;
+  resource: CuratedResource;
+}) {
+  const Icon = RESOURCE_ICON_MAP[resource.type];
+
+  return (
+    <article className="metric-card flex min-h-72 flex-col p-5 transition hover:-translate-y-0.5">
+      <div className="flex items-start justify-between gap-3">
+        <span className="blue-pill inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <button
+          aria-label={
+            resource.isBookmarked ? "Remove bookmark" : "Bookmark resource"
+          }
+          className={cn(
+            "glass-control inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+            resource.isBookmarked ? "text-slate-950" : "text-slate-500"
+          )}
+          disabled={isBookmarking}
+          onClick={() => onBookmark(resource)}
+          type="button"
+        >
+          <Bookmark
+            className={cn("h-5 w-5", resource.isBookmarked && "fill-current")}
+            aria-hidden="true"
+          />
+        </button>
+      </div>
+      <div className="mt-5 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-600">
+            {resource.type}
+          </span>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500">
+            <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+            {resource.estimatedDuration}
+          </span>
+          {resource.viewedCount > 0 ? (
+            <span className="text-xs font-semibold text-slate-500">
+              Viewed {resource.viewedCount}x
+            </span>
+          ) : null}
+        </div>
+        <h2 className="mt-3 text-lg font-black leading-6 text-slate-950">
+          {resource.title}
+        </h2>
+        <p className="mt-1 text-sm font-semibold text-slate-500">
+          {resource.creator}
+        </p>
+        <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+          {resource.description}
+        </p>
+        <p className="mt-3 rounded-[8px] bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-600">
+          {resource.reason}
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {resource.tags.map((tag) => (
+            <span
+              className="rounded-full border border-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-500"
+              key={`${resource.id}-${tag}`}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+      <Button className="mt-5 w-full" onClick={() => onOpen(resource)}>
+        Open
+        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+      </Button>
+    </article>
+  );
+}
+
+function ResourcePreferencesModal({
+  isSaving,
+  onClose,
+  onSave,
+  preferences,
+}: {
+  isSaving: boolean;
+  onClose: () => void;
+  onSave: (preferences: CuratorResourcePreferences) => void;
+  preferences: CuratorResourcePreferences;
+}) {
+  const [preferredTypes, setPreferredTypes] = useState<CuratorResourceType[]>(
+    preferences.preferredTypes
+  );
+  const [preferredTags, setPreferredTags] = useState(
+    preferences.preferredTags.join(", ")
+  );
+
+  function toggleType(type: CuratorResourceType) {
+    setPreferredTypes((current) =>
+      current.includes(type)
+        ? current.filter((item) => item !== type)
+        : [...current, type]
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
+      <section className="glass-panel w-full max-w-lg rounded-[8px] p-5 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-black text-slate-950">
+              Content Preferences
+            </h2>
+            <p className="mt-1 text-sm font-medium leading-6 text-slate-600">
+              Curator will use these preferences the next time it generates
+              recommendations.
+            </p>
+          </div>
+          <button
+            aria-label="Close preferences"
+            className="glass-control inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-600"
+            onClick={onClose}
+            type="button"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="mt-5">
+          <p className="text-sm font-black text-slate-700">Preferred formats</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {RESOURCE_CATEGORIES.filter(
+              (item): item is CuratorResourceType => item !== "All"
+            ).map((type) => (
+              <button
+                className={cn(
+                  "inline-flex min-h-10 items-center rounded-full px-4 text-sm font-black",
+                  preferredTypes.includes(type)
+                    ? "blue-pill"
+                    : "glass-control text-slate-600"
+                )}
+                key={type}
+                onClick={() => toggleType(type)}
+                type="button"
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+        <label className="mt-5 block">
+          <span className="text-sm font-black text-slate-700">
+            Preferred tags
+          </span>
+          <input
+            className="mt-2 h-12 w-full rounded-[8px] border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none"
+            onChange={(event) => setPreferredTags(event.target.value)}
+            placeholder="habit, reflection, confidence"
+            type="text"
+            value={preferredTags}
+          />
+        </label>
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button onClick={onClose} variant="secondary">
+            Cancel
+          </Button>
+          <Button
+            disabled={isSaving}
+            onClick={() =>
+              onSave({
+                preferredTypes,
+                preferredTags: preferredTags
+                  .split(",")
+                  .map((tag) => tag.trim())
+                  .filter(Boolean),
+              })
+            }
+          >
+            {isSaving ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Settings2 className="h-4 w-4" aria-hidden="true" />
+            )}
+            Save Preferences
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function filterResources(
+  resources: CuratedResource[],
+  search: string,
+  category: "All" | CuratorResourceType
+) {
+  const query = search.trim().toLowerCase();
+  return resources.filter((resource) => {
+    const matchesCategory = category === "All" || resource.type === category;
+    const searchable = [
+      resource.title,
+      resource.creator,
+      resource.description,
+      resource.reason,
+      resource.type,
+      ...resource.tags,
+    ]
+      .join(" ")
+      .toLowerCase();
+    return matchesCategory && (!query || searchable.includes(query));
+  });
+}
+
 
 function QuizHeader({
   goal,
