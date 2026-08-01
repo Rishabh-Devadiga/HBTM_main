@@ -9,9 +9,11 @@ from backend.api.schemas.common import SuccessResponse
 from backend.domains.curator.schemas.auth import (
     CuratorAuthResponse,
     CuratorAuthStatusResponse,
+    CuratorAppleLoginRequest,
     CuratorLoginRequest,
     CuratorRegisterRequest,
     CuratorRegisterResponse,
+    CuratorSocialLoginRequest,
 )
 from backend.domains.curator.workflows.auth_service import (
     AuthenticatedUser,
@@ -106,6 +108,66 @@ async def login_curator_user(
         ) from exc
     return SuccessResponse(
         message="Login successful.",
+        data=CuratorAuthResponse(
+            token=token,
+            user=user,
+            onboardingCompleted=onboarding_completed,
+        ),
+    )
+
+
+@router.post(
+    "/google",
+    response_model=SuccessResponse[CuratorAuthResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def login_curator_user_with_google(
+    request: CuratorSocialLoginRequest,
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthResponse]:
+    try:
+        token, user, onboarding_completed = await run_in_threadpool(
+            service.login_with_google,
+            id_token=request.idToken,
+            code=request.code,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"message": str(exc), "error_code": "google_login_failed"},
+        ) from exc
+    return SuccessResponse(
+        message="Google login successful.",
+        data=CuratorAuthResponse(
+            token=token,
+            user=user,
+            onboardingCompleted=onboarding_completed,
+        ),
+    )
+
+
+@router.post(
+    "/apple",
+    response_model=SuccessResponse[CuratorAuthResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def login_curator_user_with_apple(
+    request: CuratorAppleLoginRequest,
+    service: CuratorAuthService = Depends(get_curator_auth_service),
+) -> SuccessResponse[CuratorAuthResponse]:
+    try:
+        token, user, onboarding_completed = await run_in_threadpool(
+            service.login_with_apple,
+            id_token=request.idToken,
+            name=request.name,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"message": str(exc), "error_code": "apple_login_failed"},
+        ) from exc
+    return SuccessResponse(
+        message="Apple login successful.",
         data=CuratorAuthResponse(
             token=token,
             user=user,

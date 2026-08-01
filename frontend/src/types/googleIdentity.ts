@@ -16,10 +16,23 @@ export type GoogleAccountsOAuth = {
   }) => GoogleCodeClient;
 };
 
+export type GoogleCredentialResponse = {
+  credential?: string;
+};
+
+export type GoogleAccountsId = {
+  initialize: (config: {
+    client_id: string;
+    callback: (response: GoogleCredentialResponse) => void;
+  }) => void;
+  prompt: () => void;
+};
+
 declare global {
   interface Window {
     google?: {
       accounts?: {
+        id?: GoogleAccountsId;
         oauth2?: GoogleAccountsOAuth;
       };
     };

@@ -7,16 +7,21 @@ import {
   createCuratorCoachConversation,
   dismissCuratorOpportunity,
   getCuratorGrowthJourney,
+  getCuratorCommunityWorkshops,
   getCuratorCoachConversations,
   getCuratorOpportunities,
   getCuratorResources,
   openCuratorResource,
+  joinCuratorCommunityWorkshop,
+  leaveCuratorCommunityWorkshop,
   sendCuratorCoachMessage,
   submitCuratorOnboarding,
   updateCuratorResourcePreferences,
 } from "@/api/curatorApi";
 import type {
   CuratorCoachChatApiResponse,
+  CommunityWorkshopMembershipApiResponse,
+  CommunityWorkshopsApiResponse,
   CuratorCoachConversationsApiResponse,
   CuratorGrowthJourneyApiResponse,
   CuratorOnboardingApiResponse,
@@ -36,6 +41,7 @@ export const curatorQueryKeys = {
   coachConversations: ["curator", "growth-coach", "conversations"] as const,
   resources: ["curator", "resources"] as const,
   opportunities: ["curator", "opportunities"] as const,
+  communityWorkshops: ["curator", "community", "workshops"] as const,
 };
 
 export function useSubmitCuratorOnboarding() {
@@ -274,6 +280,42 @@ export function useDismissCuratorOpportunity() {
   });
 }
 
+export function useCuratorCommunityWorkshops(enabled = true) {
+  return useQuery<CommunityWorkshopsApiResponse, Error>({
+    queryKey: curatorQueryKeys.communityWorkshops,
+    queryFn: getCuratorCommunityWorkshops,
+    enabled,
+  });
+}
+
+export function useJoinCuratorCommunityWorkshop() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CommunityWorkshopMembershipApiResponse, Error, number>({
+    mutationFn: joinCuratorCommunityWorkshop,
+    onSuccess: (response) => {
+      queryClient.setQueryData<CommunityWorkshopsApiResponse>(
+        curatorQueryKeys.communityWorkshops,
+        (current) => updateWorkshopMembership(current, response.data)
+      );
+    },
+  });
+}
+
+export function useLeaveCuratorCommunityWorkshop() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CommunityWorkshopMembershipApiResponse, Error, number>({
+    mutationFn: leaveCuratorCommunityWorkshop,
+    onSuccess: (response) => {
+      queryClient.setQueryData<CommunityWorkshopsApiResponse>(
+        curatorQueryKeys.communityWorkshops,
+        (current) => updateWorkshopMembership(current, response.data)
+      );
+    },
+  });
+}
+
 function updateResourceEngagement(
   current: CuratorResourcesApiResponse | undefined,
   engagement: {
@@ -330,6 +372,35 @@ function updateOpportunityEngagement(
             : opportunity
         )
         .filter((opportunity) => !opportunity.isDismissed),
+    },
+  };
+}
+
+function updateWorkshopMembership(
+  current: CommunityWorkshopsApiResponse | undefined,
+  membership: {
+    workshopId: number;
+    participantsCount: number;
+    isJoined: boolean;
+  }
+) {
+  if (!current) {
+    return current;
+  }
+
+  return {
+    ...current,
+    data: {
+      ...current.data,
+      workshops: current.data.workshops.map((workshop) =>
+        workshop.id === membership.workshopId
+          ? {
+              ...workshop,
+              participantsCount: membership.participantsCount,
+              isJoined: membership.isJoined,
+            }
+          : workshop
+      ),
     },
   };
 }

@@ -6,6 +6,7 @@ import { AIMentorPage } from "@/pages/AIMentorPage";
 import { ApiTestPage } from "@/pages/ApiTestPage";
 import { ChatPage } from "@/pages/ChatPage";
 import { AuthChoicePage } from "@/pages/AuthChoicePage";
+import { CommunityPage } from "@/pages/CommunityPage";
 import { CuratorOnboardingPage } from "@/pages/CuratorOnboardingPage";
 import { CuratorOnboardingSuccessPage } from "@/pages/CuratorOnboardingSuccessPage";
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -102,6 +103,7 @@ export default function App() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="opportunities" element={<OpportunitiesPage />} />
+        <Route path="community" element={<CommunityPage />} />
         <Route path="api-test" element={<ApiTestPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
