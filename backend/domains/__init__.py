@@ -26,6 +26,7 @@ register_domain(
             "backend.domains.curator.api.onboarding",
             "backend.domains.curator.api.coach",
             "backend.domains.curator.api.resources",
+            "backend.domains.curator.api.opportunities",
         ),
     ),
 )

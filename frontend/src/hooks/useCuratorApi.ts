@@ -2,10 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   bookmarkCuratorResource,
+  bookmarkCuratorOpportunity,
   completeCuratorGrowthJourneyActivity,
   createCuratorCoachConversation,
+  dismissCuratorOpportunity,
   getCuratorGrowthJourney,
   getCuratorCoachConversations,
+  getCuratorOpportunities,
   getCuratorResources,
   openCuratorResource,
   sendCuratorCoachMessage,
@@ -23,12 +26,16 @@ import type {
   CuratorResourcePreferences,
   CuratorResourcePreferencesApiResponse,
   CuratorResourcesApiResponse,
+  OpportunitiesApiResponse,
+  OpportunityEngagementApiResponse,
+  OpportunityRecommendation,
 } from "@/types/curator";
 
 export const curatorQueryKeys = {
   growthJourney: ["curator", "growth-journey"] as const,
   coachConversations: ["curator", "growth-coach", "conversations"] as const,
   resources: ["curator", "resources"] as const,
+  opportunities: ["curator", "opportunities"] as const,
 };
 
 export function useSubmitCuratorOnboarding() {
@@ -212,6 +219,61 @@ export function useUpdateCuratorResourcePreferences() {
   });
 }
 
+export function useCuratorOpportunities(enabled = true) {
+  return useQuery<OpportunitiesApiResponse, Error>({
+    queryKey: curatorQueryKeys.opportunities,
+    queryFn: () => getCuratorOpportunities(false),
+    enabled,
+  });
+}
+
+export function useRefreshCuratorOpportunities() {
+  const queryClient = useQueryClient();
+
+  return useMutation<OpportunitiesApiResponse, Error>({
+    mutationFn: () => getCuratorOpportunities(true),
+    onSuccess: (response) => {
+      queryClient.setQueryData(curatorQueryKeys.opportunities, response);
+    },
+  });
+}
+
+export function useBookmarkCuratorOpportunity() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    OpportunityEngagementApiResponse,
+    Error,
+    { opportunity: OpportunityRecommendation; value: boolean }
+  >({
+    mutationFn: bookmarkCuratorOpportunity,
+    onSuccess: (response) => {
+      queryClient.setQueryData<OpportunitiesApiResponse>(
+        curatorQueryKeys.opportunities,
+        (current) => updateOpportunityEngagement(current, response.data)
+      );
+    },
+  });
+}
+
+export function useDismissCuratorOpportunity() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    OpportunityEngagementApiResponse,
+    Error,
+    { opportunity: OpportunityRecommendation; value: boolean }
+  >({
+    mutationFn: dismissCuratorOpportunity,
+    onSuccess: (response) => {
+      queryClient.setQueryData<OpportunitiesApiResponse>(
+        curatorQueryKeys.opportunities,
+        (current) => updateOpportunityEngagement(current, response.data)
+      );
+    },
+  });
+}
+
 function updateResourceEngagement(
   current: CuratorResourcesApiResponse | undefined,
   engagement: {
@@ -237,6 +299,37 @@ function updateResourceEngagement(
             }
           : resource
       ),
+    },
+  };
+}
+
+function updateOpportunityEngagement(
+  current: OpportunitiesApiResponse | undefined,
+  engagement: {
+    opportunityId: string;
+    isBookmarked: boolean;
+    isDismissed: boolean;
+  }
+) {
+  if (!current) {
+    return current;
+  }
+
+  return {
+    ...current,
+    data: {
+      ...current.data,
+      opportunities: current.data.opportunities
+        .map((opportunity) =>
+          opportunity.id === engagement.opportunityId
+            ? {
+                ...opportunity,
+                isBookmarked: engagement.isBookmarked,
+                isDismissed: engagement.isDismissed,
+              }
+            : opportunity
+        )
+        .filter((opportunity) => !opportunity.isDismissed),
     },
   };
 }

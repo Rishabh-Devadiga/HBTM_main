@@ -11,6 +11,9 @@ import type {
   CuratorResourcePreferences,
   CuratorResourcePreferencesApiResponse,
   CuratorResourcesApiResponse,
+  OpportunitiesApiResponse,
+  OpportunityEngagementApiResponse,
+  OpportunityRecommendation,
 } from "@/types/curator";
 
 export async function submitCuratorOnboarding(
@@ -125,6 +128,44 @@ export async function updateCuratorResourcePreferences(
   const response = await apiClient.put<CuratorResourcePreferencesApiResponse>(
     "/curator/resources/preferences",
     preferences
+  );
+  return response.data;
+}
+
+export async function getCuratorOpportunities(
+  refresh = false
+): Promise<OpportunitiesApiResponse> {
+  const response = await apiClient.get<OpportunitiesApiResponse>(
+    "/curator/opportunities",
+    { params: { refresh } }
+  );
+  return response.data;
+}
+
+export async function bookmarkCuratorOpportunity({
+  opportunity,
+  value,
+}: {
+  opportunity: OpportunityRecommendation;
+  value: boolean;
+}): Promise<OpportunityEngagementApiResponse> {
+  const response = await apiClient.post<OpportunityEngagementApiResponse>(
+    "/curator/opportunities/bookmark",
+    { opportunity, value }
+  );
+  return response.data;
+}
+
+export async function dismissCuratorOpportunity({
+  opportunity,
+  value,
+}: {
+  opportunity: OpportunityRecommendation;
+  value: boolean;
+}): Promise<OpportunityEngagementApiResponse> {
+  const response = await apiClient.post<OpportunityEngagementApiResponse>(
+    "/curator/opportunities/dismiss",
+    { opportunity, value }
   );
   return response.data;
 }
