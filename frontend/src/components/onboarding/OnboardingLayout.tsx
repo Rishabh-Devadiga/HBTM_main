@@ -1,7 +1,8 @@
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
+import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { ProgressBar } from "@/components/onboarding/ProgressBar";
 import type { WizardStep } from "@/components/onboarding/types";
 import { activeDomain } from "@/domain";
@@ -28,7 +29,7 @@ export function OnboardingLayout({
             to="/"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-500 shadow-[0_8px_24px_rgba(59,130,246,0.35)]">
-              <Sparkles className="h-5 w-5" aria-hidden="true" />
+              <SaarthiLogo className="h-6 w-7" />
             </span>
             <span className="text-lg">{activeDomain.application.name}</span>
           </Link>

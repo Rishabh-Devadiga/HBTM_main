@@ -35,7 +35,7 @@ export const curatorSteps: {
   {
     id: 1,
     title: "Basic Identity",
-    description: "Start with the essentials Curator should remember.",
+    description: "Start with the essentials saarthi.ai should remember.",
   },
   {
     id: 2,
@@ -55,7 +55,7 @@ export const curatorSteps: {
   {
     id: 5,
     title: "Preferred Content Types",
-    description: "Tell Curator how you like to explore ideas.",
+    description: "Tell saarthi.ai how you like to explore ideas.",
   },
   {
     id: 6,

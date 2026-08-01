@@ -1,6 +1,6 @@
-import { GraduationCap } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { SidebarFooter } from "@/components/layout/SidebarFooter";
 import { SidebarItem } from "@/components/layout/SidebarItem";
 import { activeDomain } from "@/domain";
@@ -19,7 +19,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
           to="/"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-slate-950 text-white">
-            <GraduationCap className="h-5 w-5" aria-hidden="true" />
+            <SaarthiLogo className="h-6 w-7" />
           </span>
           <span>
             <span className="block text-lg font-semibold tracking-tight text-slate-950">

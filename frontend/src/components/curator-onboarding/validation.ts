@@ -34,7 +34,7 @@ export function validateCuratorStep(
       return "Describe the future identity you want to grow into.";
     }
     if (data.aspirations.aspiration.trim().length < 8) {
-      return "Add one aspiration Curator can help you move toward.";
+      return "Add one aspiration saarthi.ai can help you move toward.";
     }
     if (!data.aspirations.horizon) {
       return "Choose a time horizon.";
