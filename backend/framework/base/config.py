@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 from backend.framework.base.api_key_rotation import load_api_keys
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 ENV_FILE = PROJECT_ROOT / ".env"
 
 load_dotenv(dotenv_path=ENV_FILE)

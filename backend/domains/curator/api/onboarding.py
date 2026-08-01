@@ -57,8 +57,8 @@ def get_identity_profile_persistence_service() -> IdentityProfilePersistenceServ
     status_code=status.HTTP_201_CREATED,
     summary="Submit Curator onboarding",
     description=(
-        "Validate Curator onboarding data and return an accepted response. "
-        "This endpoint does not invoke agents or persist data."
+        "Validate Curator onboarding data, generate personalization outputs, "
+        "persist the identity profile, and return an accepted response."
     ),
     responses={
         status.HTTP_201_CREATED: {
@@ -99,6 +99,21 @@ async def submit_curator_onboarding(
                 "error_code": "LLM_UNAVAILABLE",
             },
         ) from exc
+    except RuntimeError as exc:
+        message = str(exc)
+        if "Gemini API key" in message:
+            logger.warning("Curator onboarding setup is incomplete: %s", exc)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail={
+                    "message": (
+                        "Curator onboarding needs MOCK_MODE=true or at least one "
+                        "Gemini API key configured."
+                    ),
+                    "error_code": "ONBOARDING_SETUP_INCOMPLETE",
+                },
+            ) from exc
+        raise
     except ValueError as exc:
         logger.exception("Curator onboarding validation failed.")
         raise HTTPException(
