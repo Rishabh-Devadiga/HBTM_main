@@ -21,6 +21,7 @@ import type {
 } from "@/components/curator-onboarding/types";
 import { validateCuratorStep } from "@/components/curator-onboarding/validation";
 import { activeDomain } from "@/domain";
+import { useAuth } from "@/context/AuthContext";
 import { useSubmitCuratorOnboarding } from "@/hooks/useCuratorApi";
 import type { CuratorOnboardingRequest } from "@/types/curator";
 import { cn } from "@/utils/cn";
@@ -62,6 +63,7 @@ export function CuratorOnboardingWizard() {
   const [data, setData] = useState<CuratorOnboardingData>(initialCuratorData);
   const [error, setError] = useState<string | null>(null);
   const submitOnboarding = useSubmitCuratorOnboarding();
+  const auth = useAuth();
   const navigate = useNavigate();
   const currentStepConfig = curatorSteps[currentStep - 1];
   const progress = (currentStep / curatorSteps.length) * 100;
@@ -120,7 +122,8 @@ export function CuratorOnboardingWizard() {
     console.log("saarthi.ai onboarding data", data);
     setError(null);
     submitOnboarding.mutate(toOnboardingRequest(data), {
-      onSuccess: (response) => {
+      onSuccess: async (response) => {
+        await auth.refresh();
         navigate(response.data.nextRoute, { state: { onboardingData: data } });
       },
       onError: (requestError) => {

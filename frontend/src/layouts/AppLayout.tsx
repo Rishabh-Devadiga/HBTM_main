@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Bell, Search, X } from "lucide-react";
+import { Bell, LogOut, Search, X } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
@@ -8,6 +8,7 @@ import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { MobileSidebar } from "@/components/layout/MobileSidebar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { useSession } from "@/context/SessionContext";
+import { useAuth } from "@/context/AuthContext";
 import { activeDomain } from "@/domain";
 
 export type WorkspaceTheme = "light" | "dark";
@@ -22,6 +23,7 @@ export function AppLayout() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { state } = useSession();
+  const { logout } = useAuth();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [theme, setTheme] = useState<WorkspaceTheme>(() => {
@@ -121,6 +123,17 @@ export function AppLayout() {
                 {nudge ? (
                   <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500" />
                 ) : null}
+              </button>
+              <button
+                aria-label="Logout"
+                className="glass-control inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700"
+                onClick={() => {
+                  void logout();
+                  navigate("/");
+                }}
+                type="button"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
               </button>
               {isNotificationsOpen ? (
                 <div className="glass-panel absolute right-4 top-24 z-40 w-[min(92vw,360px)] rounded-[24px] p-4 text-left shadow-2xl sm:right-10 lg:right-12">

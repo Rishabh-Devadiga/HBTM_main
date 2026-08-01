@@ -17,6 +17,14 @@ export const apiClient = axios.create({
   },
 });
 
+export function setAuthToken(token: string | null) {
+  if (token) {
+    apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+    return;
+  }
+  delete apiClient.defaults.headers.common.Authorization;
+}
+
 export class ApiRequestError extends Error {
   errorCode: string | null;
   statusCode: number | null;

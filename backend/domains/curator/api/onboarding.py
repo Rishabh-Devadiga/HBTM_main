@@ -11,6 +11,7 @@ from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field, field_validator
 
 from backend.api.schemas.common import ErrorResponse, SuccessResponse
+from backend.domains.curator.api.auth import get_current_curator_user
 from backend.domains.learning.schemas.feedback import FeedbackReport
 from backend.domains.learning.schemas.intent import LearnerIntent
 from backend.domains.learning.schemas.learning_session import LearningSessionResponse
@@ -36,6 +37,7 @@ from backend.domains.curator.workflows.growth_journey_service import (
     CuratorGrowthJourneyService,
 )
 from backend.framework.agents.base_agent import TransientLLMError
+from backend.domains.curator.workflows.auth_service import AuthenticatedUser
 
 
 logger = logging.getLogger(__name__)
@@ -76,22 +78,29 @@ class CompleteJourneyActivityRequest(BaseModel):
     activityId: str = Field(..., min_length=3, max_length=120)
 
 
-def get_curator_onboarding_service() -> CuratorOnboardingService:
+def get_curator_onboarding_service(
+    auth_user: AuthenticatedUser = Depends(get_current_curator_user),
+) -> CuratorOnboardingService:
     """Return the Curator onboarding service dependency."""
 
-    return CuratorOnboardingService()
+    return CuratorOnboardingService(user_id=auth_user.user.id)
 
 
-def get_identity_profile_persistence_service() -> IdentityProfilePersistenceService:
+def get_identity_profile_persistence_service(
+    auth_user: AuthenticatedUser = Depends(get_current_curator_user),
+) -> IdentityProfilePersistenceService:
     """Return the Curator identity profile persistence service dependency."""
 
-    return IdentityProfilePersistenceService()
+    return IdentityProfilePersistenceService(user_id=auth_user.user.id)
 
 
-def get_curator_growth_journey_service() -> CuratorGrowthJourneyService:
+def get_curator_growth_journey_service(
+    auth_user: AuthenticatedUser = Depends(get_current_curator_user),
+) -> CuratorGrowthJourneyService:
     """Return the Curator growth journey service dependency."""
 
-    return CuratorGrowthJourneyService()
+    identity_service = IdentityProfilePersistenceService(user_id=auth_user.user.id)
+    return CuratorGrowthJourneyService(identity_service=identity_service)
 
 
 @router.post(

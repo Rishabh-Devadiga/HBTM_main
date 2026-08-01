@@ -66,6 +66,54 @@ class User(Base):
     )
 
 
+class UserCredential(Base):
+    """Password credential for an existing application user."""
+
+    __tablename__ = "user_credentials"
+    __table_args__ = (
+        UniqueConstraint("user_id", name="uq_user_credentials_user"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    password_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+
+class UserSession(Base):
+    """Persistent bearer session for a logged-in user."""
+
+    __tablename__ = "user_sessions"
+    __table_args__ = (
+        UniqueConstraint("token", name="uq_user_sessions_token"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    token: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+
+
 class LearnerIntent(Base):
     """Captured learner intent extracted from a user request."""
 
