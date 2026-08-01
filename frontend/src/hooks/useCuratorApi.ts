@@ -1,12 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  bookmarkCuratorResource,
   completeCuratorGrowthJourneyActivity,
   createCuratorCoachConversation,
   getCuratorGrowthJourney,
   getCuratorCoachConversations,
+  getCuratorResources,
+  openCuratorResource,
   sendCuratorCoachMessage,
   submitCuratorOnboarding,
+  updateCuratorResourcePreferences,
 } from "@/api/curatorApi";
 import type {
   CuratorCoachChatApiResponse,
@@ -14,11 +18,17 @@ import type {
   CuratorGrowthJourneyApiResponse,
   CuratorOnboardingApiResponse,
   CuratorOnboardingRequest,
+  CuratedResource,
+  CuratorResourceEngagementApiResponse,
+  CuratorResourcePreferences,
+  CuratorResourcePreferencesApiResponse,
+  CuratorResourcesApiResponse,
 } from "@/types/curator";
 
 export const curatorQueryKeys = {
   growthJourney: ["curator", "growth-journey"] as const,
   coachConversations: ["curator", "growth-coach", "conversations"] as const,
+  resources: ["curator", "resources"] as const,
 };
 
 export function useSubmitCuratorOnboarding() {
@@ -122,4 +132,111 @@ export function useSendCuratorCoachMessage() {
       );
     },
   });
+}
+
+export function useCuratorResources(enabled = true) {
+  return useQuery<CuratorResourcesApiResponse, Error>({
+    queryKey: curatorQueryKeys.resources,
+    queryFn: () => getCuratorResources(false),
+    enabled,
+  });
+}
+
+export function useRefreshCuratorResources() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CuratorResourcesApiResponse, Error>({
+    mutationFn: () => getCuratorResources(true),
+    onSuccess: (response) => {
+      queryClient.setQueryData(curatorQueryKeys.resources, response);
+    },
+  });
+}
+
+export function useBookmarkCuratorResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    CuratorResourceEngagementApiResponse,
+    Error,
+    { resource: CuratedResource; bookmarked: boolean }
+  >({
+    mutationFn: bookmarkCuratorResource,
+    onSuccess: (response) => {
+      queryClient.setQueryData<CuratorResourcesApiResponse>(
+        curatorQueryKeys.resources,
+        (current) => updateResourceEngagement(current, response.data)
+      );
+    },
+  });
+}
+
+export function useOpenCuratorResource() {
+  const queryClient = useQueryClient();
+
+  return useMutation<CuratorResourceEngagementApiResponse, Error, CuratedResource>({
+    mutationFn: openCuratorResource,
+    onSuccess: (response) => {
+      queryClient.setQueryData<CuratorResourcesApiResponse>(
+        curatorQueryKeys.resources,
+        (current) => updateResourceEngagement(current, response.data)
+      );
+    },
+  });
+}
+
+export function useUpdateCuratorResourcePreferences() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    CuratorResourcePreferencesApiResponse,
+    Error,
+    CuratorResourcePreferences
+  >({
+    mutationFn: updateCuratorResourcePreferences,
+    onSuccess: (response) => {
+      queryClient.setQueryData<CuratorResourcesApiResponse>(
+        curatorQueryKeys.resources,
+        (current) =>
+          current
+            ? {
+                ...current,
+                data: {
+                  ...current.data,
+                  preferences: response.data,
+                },
+              }
+            : current
+      );
+    },
+  });
+}
+
+function updateResourceEngagement(
+  current: CuratorResourcesApiResponse | undefined,
+  engagement: {
+    resourceId: string;
+    isBookmarked: boolean;
+    viewedCount: number;
+  }
+) {
+  if (!current) {
+    return current;
+  }
+
+  return {
+    ...current,
+    data: {
+      ...current.data,
+      resources: current.data.resources.map((resource) =>
+        resource.id === engagement.resourceId
+          ? {
+              ...resource,
+              isBookmarked: engagement.isBookmarked,
+              viewedCount: engagement.viewedCount,
+            }
+          : resource
+      ),
+    },
+  };
 }
