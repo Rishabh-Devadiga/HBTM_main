@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from typing import Any
 
@@ -113,7 +114,7 @@ def get_gemini_llm() -> BaseLLM:
 
     return RotatingGeminiLLM(
         api_keys=api_keys,
-        model=GEMINI_FLASH_MODEL,
+        model=os.getenv("GEMINI_MODEL", GEMINI_FLASH_MODEL),
         temperature=0.2,
         timeout=120,
         max_tokens=4096,

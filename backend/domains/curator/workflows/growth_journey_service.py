@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from sqlalchemy import select
@@ -9,9 +10,18 @@ from sqlalchemy import select
 from backend.database.crud import get_db_session
 from backend.database.database import engine
 from backend.database.models import CuratorGrowthJourney
-from backend.domains.curator.agents.curator_agent import generate_growth_journey_view
-from backend.domains.curator.agents.decision_agent import generate_decision
-from backend.domains.curator.agents.planner_agent import generate_growth_plan
+from backend.domains.curator.agents.curator_agent import (
+    _generate_deterministic_journey,
+    generate_growth_journey_view,
+)
+from backend.domains.curator.agents.decision_agent import (
+    _generate_mock_decision,
+    generate_decision,
+)
+from backend.domains.curator.agents.planner_agent import (
+    _generate_mock_growth_plan,
+    generate_growth_plan,
+)
 from backend.domains.curator.schemas.decision import Decision
 from backend.domains.curator.schemas.growth_journey import (
     CuratorGrowthJourneyResponse,
@@ -22,6 +32,10 @@ from backend.domains.curator.workflows.identity_profile_persistence_service impo
     IdentityProfilePersistenceService,
     PersistedIdentityProfile,
 )
+from backend.framework.agents.base_agent import TransientLLMError
+
+
+logger = logging.getLogger(__name__)
 
 
 class CuratorGrowthJourneyService:
@@ -74,11 +88,10 @@ class CuratorGrowthJourneyService:
         if activity_id not in completed_ids:
             completed_ids.append(activity_id)
         progress_json["completedActivityIds"] = completed_ids
-        journey = generate_growth_journey_view(
-            identity_profile=identity_record.profile,
+        journey = self._generate_journey_view_with_fallback(
+            identity_record=identity_record,
             growth_plan=GrowthPlan.model_validate(record.growth_plan_json),
             decision=Decision.model_validate(record.decision_json),
-            onboarding_json=identity_record.onboarding_json,
             progress_json=progress_json,
         )
 
@@ -92,18 +105,74 @@ class CuratorGrowthJourneyService:
             session.refresh(stored)
             return self._to_response(identity_record, stored)
 
+    def _generate_growth_plan_with_fallback(
+        self,
+        identity_profile: Any,
+    ) -> GrowthPlan:
+        """Generate a growth plan, falling back to a deterministic plan when Gemini fails."""
+
+        try:
+            return generate_growth_plan(identity_profile)
+        except TransientLLMError:
+            logger.exception(
+                "Curator Planner Agent exhausted Gemini retries; using deterministic fallback."
+            )
+            return _generate_mock_growth_plan(identity_profile)
+
+    def _generate_decision_with_fallback(
+        self,
+        identity_profile: Any,
+        growth_plan: GrowthPlan,
+    ) -> Decision:
+        """Generate a decision, falling back to a deterministic decision when Gemini fails."""
+
+        try:
+            return generate_decision(identity_profile, growth_plan)
+        except TransientLLMError:
+            logger.exception(
+                "Curator Decision Agent exhausted Gemini retries; using deterministic fallback."
+            )
+            return _generate_mock_decision(identity_profile, growth_plan)
+
+    def _generate_journey_view_with_fallback(
+        self,
+        *,
+        identity_record: PersistedIdentityProfile,
+        growth_plan: GrowthPlan,
+        decision: Decision,
+        progress_json: dict[str, Any],
+    ) -> CuratorJourneyAgentOutput:
+        """Generate the journey view, falling back to a deterministic view when Gemini fails."""
+
+        try:
+            return generate_growth_journey_view(
+                identity_profile=identity_record.profile,
+                growth_plan=growth_plan,
+                decision=decision,
+                onboarding_json=identity_record.onboarding_json,
+                progress_json=progress_json,
+            )
+        except TransientLLMError:
+            logger.exception(
+                "Curator Agent exhausted Gemini retries; using deterministic journey fallback."
+            )
+            return _generate_deterministic_journey(
+                growth_plan=growth_plan,
+                decision=decision,
+                progress_json=progress_json,
+            )
+
     def _create_journey(
         self,
         identity_record: PersistedIdentityProfile,
     ) -> CuratorGrowthJourneyResponse:
-        growth_plan = generate_growth_plan(identity_record.profile)
-        decision = generate_decision(identity_record.profile, growth_plan)
+        growth_plan = self._generate_growth_plan_with_fallback(identity_record.profile)
+        decision = self._generate_decision_with_fallback(identity_record.profile, growth_plan)
         progress_json: dict[str, Any] = {"completedActivityIds": []}
-        journey = generate_growth_journey_view(
-            identity_profile=identity_record.profile,
+        journey = self._generate_journey_view_with_fallback(
+            identity_record=identity_record,
             growth_plan=growth_plan,
             decision=decision,
-            onboarding_json=identity_record.onboarding_json,
             progress_json=progress_json,
         )
         with get_db_session() as session:
