@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select
 
 from backend.database.crud import get_db_session
+from backend.database.database import engine
 from backend.database.models import (
     CuratorCoachConversation,
     CuratorCoachMessage,
@@ -49,6 +50,14 @@ class CuratorCoachService:
         self.journey_service = journey_service or CuratorGrowthJourneyService(
             identity_service=self.identity_service
         )
+        self._ensure_tables()
+
+    def _ensure_tables(self) -> None:
+        for table in (
+            CuratorCoachConversation.__table__,
+            CuratorCoachMessage.__table__,
+        ):
+            table.create(bind=engine, checkfirst=True)
 
     def get_conversations(self) -> CuratorCoachConversationsResponse | None:
         identity_record = self.identity_service.get_latest_identity_profile()
@@ -159,7 +168,7 @@ class CuratorCoachService:
             )
             if stored_conversation.title == "New Growth Coach chat":
                 stored_conversation.title = self._title_from_message(message)
-            stored_conversation.updated_at = datetime.utcnow()
+            stored_conversation.updated_at = datetime.now(UTC)
             session.flush()
 
         refreshed = self._get_conversation(conversation_id)

@@ -6,7 +6,7 @@ import { Button } from "@/components/common/Button";
 import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import { SaarthiLogo } from "@/components/common/SaarthiLogo";
 import { useAuth } from "@/context/AuthContext";
-import { activeDomain } from "@/domain";
+import { activeDomain, onboardingRoute } from "@/domain";
 
 export function LoginPage() {
   const auth = useAuth();
@@ -22,7 +22,7 @@ export function LoginPage() {
     setIsSubmitting(true);
     try {
       const completed = await auth.login({ identifier, password });
-      navigate(completed ? "/dashboard" : "/curator/onboarding", { replace: true });
+      navigate(completed ? "/dashboard" : onboardingRoute(), { replace: true });
     } catch (requestError) {
       setError(
         requestError instanceof Error

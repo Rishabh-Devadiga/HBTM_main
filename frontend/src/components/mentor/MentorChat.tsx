@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 
 import { MentorInput } from "@/components/mentor/MentorInput";
 import { MentorMessage } from "@/components/mentor/MentorMessage";
+import { MentorSuggestions } from "@/components/mentor/MentorSuggestions";
 import { StarterPrompts } from "@/components/mentor/StarterPrompts";
 import { TypingIndicator } from "@/components/mentor/TypingIndicator";
 import type { MentorMessage as MentorMessageType } from "@/types/mentor";
@@ -19,6 +20,7 @@ export function MentorChat({
   messages,
   onSend,
   starterPrompts,
+  suggestions,
 }: MentorChatProps) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -45,6 +47,15 @@ export function MentorChat({
         )}
       </div>
       <div className="sticky bottom-0">
+        {messages.length > 0 && suggestions.length > 0 ? (
+          <div className="mx-auto max-w-[900px] px-3 py-2 sm:px-5">
+            <MentorSuggestions
+              disabled={isLoading}
+              onSelect={onSend}
+              suggestions={suggestions}
+            />
+          </div>
+        ) : null}
         <MentorInput disabled={isLoading} onSend={onSend} />
       </div>
     </section>

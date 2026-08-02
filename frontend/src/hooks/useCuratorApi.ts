@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { useSession } from "@/context/SessionContext";
+import { journeyToWorkflow } from "@/utils/curatorWorkflow";
+
 import {
   bookmarkCuratorResource,
   bookmarkCuratorOpportunity,
@@ -64,11 +67,13 @@ export function useCuratorGrowthJourney(enabled = true) {
 
 export function useCompleteCuratorJourneyActivity() {
   const queryClient = useQueryClient();
+  const { saveWorkflow } = useSession();
 
   return useMutation<CuratorGrowthJourneyApiResponse, Error, string>({
     mutationFn: completeCuratorGrowthJourneyActivity,
     onSuccess: (response) => {
       queryClient.setQueryData(curatorQueryKeys.growthJourney, response);
+      saveWorkflow(journeyToWorkflow(response.data));
     },
   });
 }

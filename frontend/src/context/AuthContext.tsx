@@ -20,6 +20,7 @@ import {
   updateCuratorProfile,
 } from "@/api/authApi";
 import { setAuthToken } from "@/api/apiClient";
+import { useSession } from "@/context/SessionContext";
 import type {
   AuthUser,
   UpdatePasswordPayload,
@@ -54,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const { clearSession } = useSession();
 
   const refresh = useCallback(async () => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
@@ -155,9 +157,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthToken(null);
       setUser(null);
       setOnboardingCompleted(false);
-      sessionStorage.removeItem("ai-learning-agent-session");
+      clearSession();
     }
-  }, []);
+  }, [clearSession]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

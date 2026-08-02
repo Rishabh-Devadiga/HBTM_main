@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import func, select
@@ -134,7 +134,7 @@ class CuratorCommunityService:
                 )
             else:
                 membership.joined = True
-                membership.updated_at = datetime.utcnow()
+                membership.updated_at = datetime.now(UTC)
             session.flush()
         return CommunityWorkshopMembershipResponse(
             workshopId=workshop_id,
@@ -156,7 +156,7 @@ class CuratorCommunityService:
             ).first()
             if membership is not None:
                 membership.joined = False
-                membership.updated_at = datetime.utcnow()
+                membership.updated_at = datetime.now(UTC)
             session.flush()
         return CommunityWorkshopMembershipResponse(
             workshopId=workshop_id,

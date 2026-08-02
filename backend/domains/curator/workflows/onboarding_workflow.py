@@ -82,7 +82,7 @@ class CuratorOnboardingWorkflow:
 
         try:
             return generate_identity_profile(request)
-        except TransientLLMError as exc:
+        except TransientLLMError:
             logger.exception(
                 "Curator Identity Agent exhausted Gemini retries/key rotation; "
                 "using deterministic onboarding fallback.",

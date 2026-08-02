@@ -23,8 +23,13 @@ def main() -> int:
         from backend.database.models import (  # noqa: F401
             CuratorCoachConversation,
             CuratorCoachMessage,
+            CuratorCommunityWorkshop,
+            CuratorCommunityWorkshopMembership,
             CuratorGrowthJourney,
             CuratorIdentityProfile,
+            CuratorOpportunityBookmark,
+            CuratorOpportunityDismissal,
+            CuratorOpportunityRecommendation,
             CuratorResourceBookmark,
             CuratorResourcePreference,
             CuratorResourceRecommendation,
@@ -35,6 +40,9 @@ def main() -> int:
             NudgeHistory,
             Progress,
             User,
+            UserCredential,
+            UserSession,
+            UserSocialIdentity,
         )
     except RuntimeError as exc:
         print("Database configuration is incomplete.")

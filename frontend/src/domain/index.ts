@@ -16,5 +16,9 @@ const configuredDomain = (import.meta.env.VITE_ACTIVE_DOMAIN as
 export const activeDomain =
   domainRegistry[configuredDomain ?? learningDomain.id] ?? learningDomain;
 
+export function onboardingRoute(): string {
+  return activeDomain.id === "curator" ? "/curator/onboarding" : "/onboarding";
+}
+
 export { domainRegistry };
 export type { DomainConfig, DomainNavigationItem } from "@/domain/types";

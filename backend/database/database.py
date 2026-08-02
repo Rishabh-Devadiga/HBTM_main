@@ -22,7 +22,7 @@ def _get_database_url() -> str:
     """Return the configured database URL or raise a clear setup error."""
 
     database_url = get_settings().database_url
-    if database_url is None:
+    if not database_url:
         raise RuntimeError(
             "DATABASE_URL is required. Add it to your .env file or environment."
         )

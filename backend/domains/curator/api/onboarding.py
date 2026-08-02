@@ -120,7 +120,7 @@ def get_curator_growth_journey_service(
             "model": ErrorResponse,
             "description": "The onboarding payload is invalid.",
         },
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "model": ErrorResponse,
             "description": "The onboarding payload failed schema validation.",
         },
@@ -174,7 +174,7 @@ async def submit_curator_onboarding(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"message": str(exc), "error_code": "bad_request"},
         ) from exc
-    except Exception as exc:
+    except Exception:
         logger.exception("Unexpected Curator onboarding failure.")
         raise
 

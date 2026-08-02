@@ -7,6 +7,7 @@ clients can send a standalone prompt without starting a domain session.
 from __future__ import annotations
 
 from backend.framework.agents.base_agent import create_base_agent
+from backend.framework.base.config import get_settings
 from backend.framework.base.llm import GEMINI_FLASH_MODEL, get_gemini_llm
 from backend.schemas.chat import ChatRequest, ChatResponse
 
@@ -17,6 +18,15 @@ class ChatServiceError(RuntimeError):
 
 def generate_chat_response(request: ChatRequest) -> ChatResponse:
     """Generate a response using one temporary CrewAI agent."""
+
+    if get_settings().mock_mode:
+        return ChatResponse(
+            response=(
+                f"Mock mode: you asked \"{request.prompt.strip()}\". "
+                "This deterministic reply avoids Gemini API usage in local runs."
+            ),
+            model=GEMINI_FLASH_MODEL,
+        )
 
     try:
         agent = create_base_agent(

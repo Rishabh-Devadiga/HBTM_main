@@ -12,6 +12,7 @@ from collections.abc import Sequence
 
 from backend.database import crud
 from backend.database.crud import PersistenceError
+from backend.database.database import engine
 from backend.database.models import (
     FeedbackHistory,
     LearnerIntent as LearnerIntentRecord,
@@ -34,6 +35,20 @@ LEARNING_DOMAIN_CONFIG = get_learning_domain_config()
 
 class PersistenceService:
     """Coordinate reusable persistence operations for learning workflows."""
+
+    def __init__(self) -> None:
+        self._ensure_tables()
+
+    def _ensure_tables(self) -> None:
+        for table in (
+            User.__table__,
+            LearnerIntentRecord.__table__,
+            LearningPlanRecord.__table__,
+            Progress.__table__,
+            FeedbackHistory.__table__,
+            NudgeHistory.__table__,
+        ):
+            table.create(bind=engine, checkfirst=True)
 
     def create_user(self, name: str, email: str | None = None) -> User:
         """Create and return a user record."""

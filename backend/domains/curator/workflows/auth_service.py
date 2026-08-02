@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import secrets
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import jwt
 import requests
@@ -199,7 +199,12 @@ class CuratorAuthService:
             record = session.scalars(
                 select(UserSession).where(UserSession.token == token)
             ).first()
-            if record is None or record.expires_at < datetime.utcnow():
+            if record is None:
+                return None
+            expires_at = record.expires_at
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=UTC)
+            if expires_at < datetime.now(UTC):
                 return None
             user = session.get(User, record.user_id)
             if user is None:
@@ -326,7 +331,7 @@ class CuratorAuthService:
             UserSession(
                 user_id=user_id,
                 token=token,
-                expires_at=datetime.utcnow() + SESSION_TTL,
+                expires_at=datetime.now(UTC) + SESSION_TTL,
             )
         )
         session.flush()

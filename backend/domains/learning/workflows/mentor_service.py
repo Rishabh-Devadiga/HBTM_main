@@ -7,6 +7,7 @@ from typing import Protocol
 from backend.domains.learning.config import get_learning_domain_config
 from backend.domains.learning.prompts import load_prompt_block
 from backend.framework.agents.base_agent import run_with_gemini_retry
+from backend.framework.base.config import get_settings
 from backend.framework.base.llm import get_gemini_llm
 from backend.domains.learning.schemas.mentor import MentorChatRequest, MentorChatResponse
 
@@ -35,6 +36,16 @@ class MentorService:
 
     def chat(self, request: MentorChatRequest) -> MentorChatResponse:
         """Generate one contextual mentor response."""
+
+        if get_settings().mock_mode:
+            return MentorChatResponse(
+                reply=(
+                    f"Mock mode: \"{request.message.strip()}\" is a great question. "
+                    "Break it into small parts, practice each one, and check your "
+                    "understanding with examples."
+                ),
+                suggested_followups=self._suggest_followups(request),
+            )
 
         prompt = self._build_prompt(request)
         llm = self.llm or get_gemini_llm()

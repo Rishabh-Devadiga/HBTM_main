@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import requests
@@ -23,7 +23,6 @@ from backend.database.models import (
 from backend.domains.curator.agents.opportunity_agent import (
     generate_opportunity_recommendations,
 )
-from backend.domains.curator.schemas.decision import Decision
 from backend.domains.curator.schemas.growth_journey import CuratorJourneyAgentOutput
 from backend.domains.curator.schemas.opportunities import (
     OpportunitiesResponse,
@@ -32,7 +31,6 @@ from backend.domains.curator.schemas.opportunities import (
     OpportunityEngagementResponse,
     OpportunityRecommendation,
 )
-from backend.domains.curator.schemas.planner import GrowthPlan
 from backend.domains.curator.workflows.growth_journey_service import (
     CuratorGrowthJourneyService,
 )
@@ -154,7 +152,7 @@ class CuratorOpportunityService:
             else:
                 record.opportunity_json = opportunity.model_dump(mode="json")
                 record.bookmarked = bookmarked
-                record.updated_at = datetime.utcnow()
+                record.updated_at = datetime.now(UTC)
             session.flush()
 
         return OpportunityEngagementResponse(
@@ -194,7 +192,7 @@ class CuratorOpportunityService:
             else:
                 record.opportunity_json = opportunity.model_dump(mode="json")
                 record.dismissed = dismissed
-                record.updated_at = datetime.utcnow()
+                record.updated_at = datetime.now(UTC)
             session.flush()
 
         return OpportunityEngagementResponse(
@@ -273,12 +271,23 @@ class CuratorOpportunityService:
         persisted = context["persisted_context"]
         keywords = self._keywords(persisted)
         candidates: list[OpportunityCandidate] = []
-        candidates.extend(self._fetch_github_open_source(keywords))
-        candidates.extend(self._fetch_arbeitnow_jobs(keywords, persisted))
-        candidates.extend(self._fetch_remoteok_jobs(keywords, persisted))
-        candidates.extend(self._fetch_devpost_hackathons(keywords))
-        candidates.extend(self._fetch_reddit_communities(keywords))
-        candidates.extend(self._static_verified_directories(keywords))
+        fetch_sources = [
+            ("GitHub", lambda: self._fetch_github_open_source(keywords)),
+            ("Arbeitnow", lambda: self._fetch_arbeitnow_jobs(keywords, persisted)),
+            ("Remote OK", lambda: self._fetch_remoteok_jobs(keywords, persisted)),
+            ("Devpost", lambda: self._fetch_devpost_hackathons(keywords)),
+            ("Reddit", lambda: self._fetch_reddit_communities(keywords)),
+            ("Verified directories", lambda: self._static_verified_directories(keywords)),
+        ]
+        for source_name, fetcher in fetch_sources:
+            try:
+                candidates.extend(fetcher())
+            except Exception as exc:
+                logger.warning(
+                    "Skipping %s opportunity source after fetch/validation error: %s",
+                    source_name,
+                    exc,
+                )
         unique: dict[str, OpportunityCandidate] = {}
         for candidate in candidates:
             unique.setdefault(candidate.id, candidate)
@@ -304,13 +313,22 @@ class CuratorOpportunityService:
             candidates.append(
                 OpportunityCandidate(
                     id=self._stable_id("github", html_url),
-                    title=item.get("full_name", "GitHub project"),
+                    title=self._clean_text(
+                        item.get("full_name"),
+                        "GitHub project",
+                        min_length=2,
+                        max_length=240,
+                    ),
                     category="Open Source",
                     organizer=item.get("owner", {}).get("login", "GitHub"),
                     location="Online",
                     mode="Online",
                     date=f"Updated {item.get('updated_at', '')[:10]}",
-                    description=item.get("description") or "Open source repository.",
+                    description=self._clean_text(
+                        item.get("description"),
+                        "Open source repository.",
+                        min_length=10,
+                    ),
                     url=html_url,
                     tags=[
                         tag
@@ -350,13 +368,27 @@ class CuratorOpportunityService:
             candidates.append(
                 OpportunityCandidate(
                     id=self._stable_id("arbeitnow", url),
-                    title=title,
+                    title=self._clean_text(
+                        title,
+                        "Professional opportunity",
+                        min_length=2,
+                        max_length=240,
+                    ),
                     category=self._job_category(title, context),
                     organizer=item.get("company_name") or "Arbeitnow employer",
-                    location=item.get("location") or "Online",
+                    location=self._clean_text(
+                        item.get("location"),
+                        "Online",
+                        min_length=2,
+                        max_length=180,
+                    ),
                     mode="Online" if item.get("remote") else "Offline",
                     date=self._unix_date(item.get("created_at")),
-                    description=description[:420] or title,
+                    description=self._clean_text(
+                        description[:420],
+                        title,
+                        min_length=10,
+                    ),
                     url=url,
                     tags=[str(tag) for tag in tags[:8]],
                     source="Arbeitnow Job Board API",
@@ -389,13 +421,22 @@ class CuratorOpportunityService:
             candidates.append(
                 OpportunityCandidate(
                     id=self._stable_id("remoteok", url),
-                    title=title,
+                    title=self._clean_text(
+                        title,
+                        "Professional opportunity",
+                        min_length=2,
+                        max_length=240,
+                    ),
                     category=self._job_category(title, context),
                     organizer=item.get("company") or "Remote OK employer",
                     location="Online",
                     mode="Online",
                     date=str(item.get("date", "Active")),
-                    description=description[:420] or title,
+                    description=self._clean_text(
+                        description[:420],
+                        title,
+                        min_length=10,
+                    ),
                     url=url,
                     tags=[str(tag) for tag in item.get("tags", [])[:8]],
                     source="Remote OK API",
@@ -463,13 +504,22 @@ class CuratorOpportunityService:
             candidates.append(
                 OpportunityCandidate(
                     id=self._stable_id("reddit", display),
-                    title=display,
+                    title=self._clean_text(
+                        display,
+                        "Community",
+                        min_length=2,
+                        max_length=240,
+                    ),
                     category="Community",
                     organizer="Reddit",
                     location="Online",
                     mode="Online",
                     date="Active community",
-                    description=item.get("public_description") or f"{display} community.",
+                    description=self._clean_text(
+                        item.get("public_description"),
+                        f"{display} community.",
+                        min_length=10,
+                    ),
                     url=f"https://www.reddit.com{permalink}",
                     tags=[*keywords[:4], "community", "reddit"],
                     source="Reddit public search",
@@ -793,6 +843,8 @@ class CuratorOpportunityService:
             CuratorOpportunityRecommendation.__table__,
             CuratorOpportunityBookmark.__table__,
             CuratorOpportunityDismissal.__table__,
+            CuratorCoachConversation.__table__,
+            CuratorCoachMessage.__table__,
         ):
             table.create(bind=engine, checkfirst=True)
 
@@ -880,6 +932,21 @@ class CuratorOpportunityService:
 
     def _strip_html(self, value: str) -> str:
         return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", value)).strip()
+
+    def _clean_text(
+        self,
+        value: Any,
+        fallback: str,
+        *,
+        min_length: int,
+        max_length: int = 1200,
+    ) -> str:
+        text = str(value or "").strip()
+        if len(text) < min_length:
+            text = str(fallback or "").strip()
+        if len(text) < min_length:
+            text = "Opportunity matched to your growth profile."
+        return text[:max_length]
 
     def _unix_date(self, value: Any) -> str:
         try:

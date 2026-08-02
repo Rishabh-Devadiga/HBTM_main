@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
 import { useAuth } from "@/context/AuthContext";
+import { onboardingRoute } from "@/domain";
 
 type SocialAuthButtonsProps = {
   onUnavailable: (message: string) => void;
@@ -20,7 +21,7 @@ export function SocialAuthButtons({ onUnavailable }: SocialAuthButtonsProps) {
   );
 
   async function finishLogin(completed: boolean) {
-    navigate(completed ? "/dashboard" : "/curator/onboarding", { replace: true });
+    navigate(completed ? "/dashboard" : onboardingRoute(), { replace: true });
   }
 
   async function handleGoogle() {

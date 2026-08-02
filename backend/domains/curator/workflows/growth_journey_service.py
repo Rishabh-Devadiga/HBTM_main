@@ -7,6 +7,7 @@ from typing import Any
 from sqlalchemy import select
 
 from backend.database.crud import get_db_session
+from backend.database.database import engine
 from backend.database.models import CuratorGrowthJourney
 from backend.domains.curator.agents.curator_agent import generate_growth_journey_view
 from backend.domains.curator.agents.decision_agent import generate_decision
@@ -16,7 +17,6 @@ from backend.domains.curator.schemas.growth_journey import (
     CuratorGrowthJourneyResponse,
     CuratorJourneyAgentOutput,
 )
-from backend.domains.curator.schemas.identity import IdentityProfile
 from backend.domains.curator.schemas.planner import GrowthPlan
 from backend.domains.curator.workflows.identity_profile_persistence_service import (
     IdentityProfilePersistenceService,
@@ -32,6 +32,10 @@ class CuratorGrowthJourneyService:
         identity_service: IdentityProfilePersistenceService | None = None,
     ) -> None:
         self.identity_service = identity_service or IdentityProfilePersistenceService()
+        self._ensure_tables()
+
+    def _ensure_tables(self) -> None:
+        CuratorGrowthJourney.__table__.create(bind=engine, checkfirst=True)
 
     def get_growth_journey(self) -> CuratorGrowthJourneyResponse | None:
         """Return the latest persisted journey, creating it once if needed."""

@@ -3,8 +3,8 @@ import {
   BriefcaseBusiness,
   ClipboardCheck,
   LayoutDashboard,
-  MessageCircle,
   MessagesSquare,
+  ShoppingBag,
   TrendingUp,
 } from "lucide-react";
 
@@ -33,6 +33,7 @@ export const learningDomain: DomainConfig = {
         icon: BriefcaseBusiness,
       },
       { label: "Progress", path: "/progress", icon: TrendingUp },
+      { label: "Merchandise", path: "/merchandise", icon: ShoppingBag },
     ],
   },
   features: {

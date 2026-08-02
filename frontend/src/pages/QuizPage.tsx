@@ -177,6 +177,23 @@ function LearningQuizPage() {
     );
   }
 
+  if (quiz.questions.length === 0) {
+    return (
+      <div className="space-y-5">
+        <QuizHeader goal={plan.learning_goal} topicCount={topics.length} />
+        <QuizError
+          message="The quiz generator did not return any questions. Try generating again."
+        />
+        <div className="flex justify-end">
+          <Button onClick={() => void handleGenerateQuiz()}>
+            <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+            {activeDomain.pages.quiz.generateAction}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   const question = quiz.questions[currentQuestion];
   const allQuestionsAnswered = selectedAnswers.every(Boolean);
   const isFinalQuestion = currentQuestion === quiz.questions.length - 1;

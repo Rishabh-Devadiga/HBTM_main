@@ -44,6 +44,7 @@ const modes: Array<"All" | OpportunityMode> = [
   "Online",
   "Offline",
   "Hybrid",
+  "Unknown",
 ];
 
 export function OpportunitiesPage() {

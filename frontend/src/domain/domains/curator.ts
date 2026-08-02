@@ -3,11 +3,11 @@ import {
   LibraryBig,
   Map,
   MessagesSquare,
-  NotebookPen,
   UsersRound,
   Radar,
   Repeat,
   Settings,
+  ShoppingBag,
   UserRound,
 } from "lucide-react";
 
@@ -32,6 +32,7 @@ export const curatorDomain: DomainConfig = {
       { label: "Curated Resources", path: "/quiz", icon: LibraryBig },
       { label: "Opportunities", path: "/opportunities", icon: Radar },
       { label: "Community", path: "/community", icon: UsersRound },
+      { label: "Merchandise", path: "/merchandise", icon: ShoppingBag },
       { label: "Habits", path: "/progress", icon: Repeat },
       { label: "Profile", path: "/profile", icon: UserRound },
       { label: "Settings", path: "/settings", icon: Settings },
@@ -291,6 +292,15 @@ export const curatorDomain: DomainConfig = {
     faq2Question: "Does the landing page create a session?",
     faq2Answer:
       "No. It only introduces saarthi.ai and takes you to Chat. A session starts only after you submit your request there.",
+    faq3Question: "Can I return to my journey after refreshing?",
+    faq3Answer:
+      "Yes. Your current growth journey is stored securely, so the dashboard, habits, reflections, and resource views stay available.",
+  },
+  labels: {
+    subject: "Subject",
+    skillLevel: "Skill Level",
+    targetDeadline: "Target Deadline",
+    targetCompletion: "Target Completion",
     dailyCommitment: "Daily Commitment",
     currentStage: "Current Stage",
     workflowStatus: "Workflow Status",

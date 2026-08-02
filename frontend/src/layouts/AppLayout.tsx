@@ -33,6 +33,12 @@ export function AppLayout() {
   const isLearningPlan = location.pathname === "/learning-plan";
   const searchValue = isLearningPlan ? searchParams.get("q") ?? "" : "";
   const nudge = state.nudges;
+  const todayLabel = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   if (location.pathname === "/" || location.pathname === "/onboarding") {
     return <Outlet />;
@@ -83,7 +89,7 @@ export function AppLayout() {
           <header className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-500">
-                Monday, July 27 2026
+                {todayLabel}
               </p>
               <h1 className="mt-1 text-2xl font-semibold tracking-normal text-slate-950 sm:text-3xl">
                 {pageTitle}

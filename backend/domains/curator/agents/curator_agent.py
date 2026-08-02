@@ -18,7 +18,10 @@ from backend.domains.curator.schemas.growth_journey import (
 )
 from backend.domains.curator.schemas.identity import IdentityProfile
 from backend.domains.curator.schemas.planner import GrowthPlan
-from backend.domains.curator.schemas.resources import CuratedResourceAgentOutput
+from backend.domains.curator.schemas.resources import (
+    CuratedResource,
+    CuratedResourceAgentOutput,
+)
 from backend.framework.agents.base_agent import create_base_agent, run_structured_agent
 from backend.framework.base.config import get_settings
 
@@ -181,6 +184,13 @@ def generate_curated_resources(
 ) -> CuratedResourceAgentOutput:
     """Generate personalized resource recommendations with the Curator Agent."""
 
+    if get_settings().mock_mode:
+        return _generate_deterministic_resources(
+            growth_plan=growth_plan,
+            decision=decision,
+            growth_journey=growth_journey,
+        )
+
     curator_agent = agent or create_curator_agent()
     prompt = CURATOR_RESOURCES_PROMPT.format(
         identity_profile_json=identity_profile.model_dump_json(indent=2),
@@ -258,6 +268,58 @@ def _generate_deterministic_coach_response(
             f"What could block {current_phase.title}?",
             "Give me a short reflection prompt",
         ],
+    )
+
+
+def _generate_deterministic_resources(
+    *,
+    growth_plan: GrowthPlan,
+    decision: Decision,
+    growth_journey: CuratorJourneyAgentOutput,
+) -> CuratedResourceAgentOutput:
+    """Create deterministic resource recommendations for local and test runs."""
+
+    current_phase = growth_journey.currentPhase
+    entries = [
+        ("Book", "The Art of Focused Growth"),
+        ("Video", f"Understanding {growth_plan.journey.growthTheme}"),
+        ("Podcast", f"Growing With {growth_plan.journey.growthTheme}"),
+        ("Article", "Building a Sustainable Growth Loop"),
+    ]
+    resources = [
+        CuratedResource(
+            id=f"mock-resource-{index}",
+            title=title,
+            creator="saarthi.ai curated picks",
+            description=(
+                f"A {resource_type.lower()} selected to support "
+                f"{growth_plan.journey.growthTheme} and your current phase."
+            ),
+            tags=[
+                *growth_plan.curationStrategy.recommendedMediaCategories[:3],
+                growth_plan.journey.growthTheme,
+            ],
+            estimatedDuration="25 min",
+            type=resource_type,
+            url="https://example.com/curated",
+            reason=(
+                f"Supports {current_phase.title} and your preferred "
+                f"{decision.recommendedResourceType} format."
+            ),
+        )
+        for index, (resource_type, title) in enumerate(entries)
+    ]
+    return CuratedResourceAgentOutput(
+        recommendationSummary=(
+            f"A focused starter set for {growth_plan.journey.growthTheme} "
+            "based on your current phase."
+        ),
+        selectionReasons=[
+            f"Matches {growth_plan.journey.growthTheme}",
+            "Aligned with your current phase priorities",
+            "Selected for your preferred learning style",
+        ],
+        resources=resources,
     )
 
 

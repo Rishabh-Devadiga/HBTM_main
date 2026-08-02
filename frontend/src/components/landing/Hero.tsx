@@ -3,7 +3,6 @@ import {
   BarChart3,
   BookOpenCheck,
   Check,
-  MessageSquareText,
   Sparkles,
   Target,
 } from "lucide-react";

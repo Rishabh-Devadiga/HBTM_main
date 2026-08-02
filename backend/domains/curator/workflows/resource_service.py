@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import func, select
@@ -18,9 +18,7 @@ from backend.database.models import (
     CuratorResourceView,
 )
 from backend.domains.curator.agents.curator_agent import generate_curated_resources
-from backend.domains.curator.schemas.decision import Decision
 from backend.domains.curator.schemas.growth_journey import CuratorJourneyAgentOutput
-from backend.domains.curator.schemas.planner import GrowthPlan
 from backend.domains.curator.schemas.resources import (
     CuratedResource,
     CuratedResourceAgentOutput,
@@ -111,7 +109,7 @@ class CuratorResourceService:
             else:
                 bookmark.resource_json = resource_json
                 bookmark.bookmarked = bookmarked
-                bookmark.updated_at = datetime.utcnow()
+                bookmark.updated_at = datetime.now(UTC)
             session.flush()
 
         return CuratorResourceEngagementResponse(
@@ -171,7 +169,7 @@ class CuratorResourceService:
                 session.add(record)
             else:
                 record.preferences_json = preferences.model_dump(mode="json")
-                record.updated_at = datetime.utcnow()
+                record.updated_at = datetime.now(UTC)
             session.flush()
         return preferences
 
@@ -389,5 +387,7 @@ class CuratorResourceService:
             CuratorResourceBookmark.__table__,
             CuratorResourceView.__table__,
             CuratorResourcePreference.__table__,
+            CuratorCoachConversation.__table__,
+            CuratorCoachMessage.__table__,
         ):
             table.create(bind=engine, checkfirst=True)
