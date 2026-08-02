@@ -67,7 +67,10 @@ const youtubeApiKeys = loadApiKeys(
   ],
   import.meta.env.VITE_YOUTUBE_API_KEY
 );
-const youtubeKeyPool = new StickyApiKeyPool("YouTube", youtubeApiKeys);
+const youtubeKeyPool =
+  youtubeApiKeys.length > 0
+    ? new StickyApiKeyPool("YouTube", youtubeApiKeys)
+    : null;
 const tutorialCache = new Map<string, YouTubeVideo[]>();
 const tutorialErrors = new Map<string, YouTubeSearchError>();
 const tutorialRequests = new Map<string, Promise<YouTubeVideo[]>>();
@@ -205,6 +208,11 @@ async function fetchYouTube(
   resource: "search" | "videos",
   params: URLSearchParams
 ): Promise<Response> {
+  if (youtubeKeyPool === null) {
+    throw new YouTubeSearchError(
+      "YouTube search is not configured. Add YouTube API keys to enable video results."
+    );
+  }
   return youtubeKeyPool.execute(async (apiKey) => {
     const requestParams = new URLSearchParams(params);
     requestParams.set("key", apiKey);
