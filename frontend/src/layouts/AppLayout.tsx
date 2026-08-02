@@ -67,17 +67,17 @@ export function AppLayout() {
   return (
     <div
       className={cn(
-        "workspace-shell min-h-screen overflow-x-hidden px-3 py-4 text-slate-950 sm:px-5 lg:px-7",
+        "workspace-shell min-h-screen overflow-x-clip px-3 py-4 text-slate-950 sm:px-5 lg:px-7",
         theme === "dark" ? "dark-workspace bg-[#202020]" : "bg-[#e8eff9]"
       )}
     >
       <div
         className={cn(
-          "relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1480px] overflow-hidden rounded-[8px] shadow-[0_24px_70px_rgba(30,30,30,0.12)]",
+          "relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1480px] overflow-clip rounded-[8px] shadow-[0_24px_70px_rgba(30,30,30,0.12)]",
           theme === "dark" ? "bg-[#252525]" : "bg-[#f5f7fb]"
         )}
       >
-        <div className="hidden shrink-0 lg:block">
+        <div className="hidden shrink-0 lg:block lg:sticky lg:top-4 lg:z-10 lg:h-[calc(100vh-2rem)] lg:self-start">
           <Sidebar />
         </div>
         <MobileSidebar

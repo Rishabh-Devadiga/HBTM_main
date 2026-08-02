@@ -11,7 +11,7 @@ type SidebarProps = {
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   return (
-    <aside className="flex h-auto min-h-full w-[220px] shrink-0 flex-col rounded-[28px] bg-white p-4 text-slate-950">
+    <aside className="flex h-full w-[220px] shrink-0 flex-col rounded-[28px] bg-white p-4 text-slate-950">
       <div className="pb-6 pt-1">
         <Link
           className="group flex items-center gap-3 rounded-full px-1 py-2 transition hover:bg-slate-950 hover:text-white"
@@ -36,7 +36,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
         Menu
       </p>
       <nav
-        className="space-y-2"
+        className="flex-1 space-y-2 overflow-y-auto pb-2 pr-1"
         aria-label={activeDomain.navigation.ariaLabel}
       >
         {activeDomain.navigation.items.map((item) => (
