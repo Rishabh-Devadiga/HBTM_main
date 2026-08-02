@@ -7,6 +7,7 @@ object that future backend modules can import.
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from functools import lru_cache
@@ -20,6 +21,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 ENV_FILE = PROJECT_ROOT / ".env"
 
 load_dotenv(dotenv_path=ENV_FILE)
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -66,13 +69,13 @@ def _optional_env(name: str) -> str | None:
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
-    """Parse a boolean environment variable, tolerating empty values."""
+    """Parse a boolean environment variable without crashing on bad values."""
 
     value = os.getenv(name)
     if value is None:
         return default
 
-    normalized_value = value.strip().lower()
+    normalized_value = value.strip().strip("\"'").lower()
     if not normalized_value:
         return default
     if normalized_value in {"1", "true", "yes", "y", "on"}:
@@ -80,10 +83,13 @@ def _env_bool(name: str, default: bool = False) -> bool:
     if normalized_value in {"0", "false", "no", "n", "off"}:
         return False
 
-    raise RuntimeError(
-        f"{name} must be a boolean value such as true or false. "
-        f"Update {ENV_FILE} or your environment."
+    logger.warning(
+        "Ignoring unrecognized boolean value %r for %s; using default %s.",
+        value,
+        name,
+        default,
     )
+    return default
 
 
 @lru_cache
