@@ -66,13 +66,15 @@ def _optional_env(name: str) -> str | None:
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
-    """Parse a boolean environment variable."""
+    """Parse a boolean environment variable, tolerating empty values."""
 
     value = os.getenv(name)
     if value is None:
         return default
 
     normalized_value = value.strip().lower()
+    if not normalized_value:
+        return default
     if normalized_value in {"1", "true", "yes", "y", "on"}:
         return True
     if normalized_value in {"0", "false", "no", "n", "off"}:
