@@ -29,6 +29,7 @@ register_domain(
             "backend.domains.curator.api.resources",
             "backend.domains.curator.api.opportunities",
             "backend.domains.curator.api.community",
+            "backend.api.routes.calendar",
         ),
     ),
 )
