@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import sys
 
 from fastapi import FastAPI, HTTPException, Request, status
@@ -29,6 +30,12 @@ LOCAL_CORS_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+DEPLOYED_CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+ALLOWED_CORS_ORIGINS = [*LOCAL_CORS_ORIGINS, *DEPLOYED_CORS_ORIGINS]
 LOCAL_CORS_ORIGIN_REGEX = r"^https?://(?:localhost|127\.0\.0\.1)(?::\d+)?$"
 
 fastapi_app = FastAPI(
@@ -138,7 +145,7 @@ async def unhandled_exception_handler(
 # include the browser-visible CORS headers.
 app = CORSMiddleware(
     app=fastapi_app,
-    allow_origins=LOCAL_CORS_ORIGINS,
+    allow_origins=ALLOWED_CORS_ORIGINS,
     allow_origin_regex=LOCAL_CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
