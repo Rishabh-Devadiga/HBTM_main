@@ -386,6 +386,7 @@ class CuratorAuthService:
             UserCredential.__table__,
             UserSocialIdentity.__table__,
             UserSession.__table__,
+            CuratorIdentityProfile.__table__,
         ):
             table.create(bind=engine, checkfirst=True)
         self._ensure_user_profile_columns()

@@ -63,7 +63,7 @@ export function RegisterPage() {
           <input
             className="mt-2 h-12 w-full rounded-[8px] border border-slate-200 px-4 text-sm"
             onChange={(event) => setUsername(event.target.value)}
-            pattern="[A-Za-z0-9_.-]+"
+            pattern={"[A-Za-z0-9_.\\-]+"}
             required
             value={username}
           />

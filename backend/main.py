@@ -25,35 +25,22 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-app = FastAPI(
+LOCAL_CORS_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+LOCAL_CORS_ORIGIN_REGEX = r"^https?://(?:localhost|127\.0\.0\.1)(?::\d+)?$"
+
+fastapi_app = FastAPI(
     title="AI-Learning-Agent API",
     description="Backend foundation for the AI-powered personal learning agent.",
     version="0.1.0",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://localhost:5177",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:5176",
-        "http://127.0.0.1:5177",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(api_router)
+fastapi_app.include_router(api_router)
 
 
-@app.middleware("http")
+@fastapi_app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Log incoming HTTP requests so frontend/backend flow is visible."""
 
@@ -84,7 +71,7 @@ def _json_safe_validation_errors(exc: RequestValidationError) -> list[dict[str, 
     return safe_errors
 
 
-@app.exception_handler(HTTPException)
+@fastapi_app.exception_handler(HTTPException)
 async def http_exception_handler(
     request: Request, exc: HTTPException
 ) -> JSONResponse:
@@ -112,7 +99,7 @@ async def http_exception_handler(
     )
 
 
-@app.exception_handler(RequestValidationError)
+@fastapi_app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
@@ -130,7 +117,7 @@ async def validation_exception_handler(
     )
 
 
-@app.exception_handler(Exception)
+@fastapi_app.exception_handler(Exception)
 async def unhandled_exception_handler(
     request: Request, exc: Exception
 ) -> JSONResponse:
@@ -145,3 +132,15 @@ async def unhandled_exception_handler(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=jsonable_encoder(error),
     )
+
+
+# Keep CORS outside FastAPI's error middleware so even unexpected failures
+# include the browser-visible CORS headers.
+app = CORSMiddleware(
+    app=fastapi_app,
+    allow_origins=LOCAL_CORS_ORIGINS,
+    allow_origin_regex=LOCAL_CORS_ORIGIN_REGEX,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
