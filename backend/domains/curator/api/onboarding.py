@@ -140,7 +140,9 @@ async def submit_curator_onboarding(
     try:
         response = await run_in_threadpool(service.submit_onboarding, request)
     except TransientLLMError as exc:
-        logger.warning("Curator onboarding failed because Gemini is unavailable: %s", exc)
+        logger.exception(
+            "Curator onboarding failed after exhausting Gemini retries/key rotation."
+        )
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={
